@@ -7,43 +7,50 @@ const Navbar = () => {
     const [isOpen, setIsOpen] = React.useState(false);
 
     return (
-        <nav className="fixed w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between h-16 items-center">
+        <nav className="fixed w-full z-50 bg-white border-b" style={{ top: 0, left: 0, backgroundColor: 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(8px)' }}>
+            <div className="max-w-7xl px-4" style={{ margin: '0 auto' }}>
+                <div className="flex justify-between items-center" style={{ height: '64px' }}>
                     <div className="flex items-center">
-                        <Link to="/" className="flex items-center space-x-2">
-                            <Brain className="h-8 w-8 text-indigo-600" />
-                            <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
+                        <Link to="/" className="flex items-center gap-2">
+                            <Brain style={{ height: '32px', width: '32px', color: 'var(--primary)' }} />
+                            <span className="text-xl" style={{ fontWeight: '800', background: 'linear-gradient(to right, var(--primary), #8E44AD)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                                 Chaitanya
                             </span>
                         </Link>
                     </div>
 
                     {/* Desktop Menu */}
-                    <div className="hidden md:flex items-center space-x-8">
-                        <Link to="/" className="text-gray-600 hover:text-indigo-600 transition-colors">Home</Link>
-                        <Link to="/chat" className="text-gray-600 hover:text-indigo-600 transition-colors">Assessment</Link>
-                        <Link to="/dashboard" className="text-gray-600 hover:text-indigo-600 transition-colors">Dashboard</Link>
+                    <div className="flex items-center gap-8" style={{ display: 'none' }} id="desktop-menu">
+                        <Link to="/" style={{ color: 'var(--text-secondary)', fontWeight: '500' }}>Home</Link>
 
                         <SignedIn>
+                            <Link to="/chat" style={{ color: 'var(--text-secondary)', fontWeight: '500' }}>Assessment</Link>
+                            <Link to="/dashboard" style={{ color: 'var(--text-secondary)', fontWeight: '500' }}>Dashboard</Link>
                             <UserButton afterSignOutUrl="/" />
                         </SignedIn>
                         <SignedOut>
                             <SignInButton mode="modal">
-                                <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-all shadow-sm">
+                                <button className="accessible-button bg-primary text-white" style={{ padding: '0.5rem 1.25rem', fontSize: '1rem' }}>
                                     Sign In
                                 </button>
                             </SignInButton>
                         </SignedOut>
                     </div>
+                    <style dangerouslySetInnerHTML={{
+                        __html: `
+            @media (min-width: 768px) {
+              #desktop-menu { display: flex !important; }
+              #mobile-toggle { display: none !important; }
+            }
+          ` }} />
 
                     {/* Mobile menu button */}
-                    <div className="md:hidden flex items-center">
+                    <div id="mobile-toggle" className="flex items-center">
                         <button
                             onClick={() => setIsOpen(!isOpen)}
-                            className="text-gray-600 hover:text-indigo-600 focus:outline-none"
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)' }}
                         >
-                            {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                            {isOpen ? <X style={{ height: '24px', width: '24px' }} /> : <Menu style={{ height: '24px', width: '24px' }} />}
                         </button>
                     </div>
                 </div>
@@ -51,18 +58,21 @@ const Navbar = () => {
 
             {/* Mobile Menu */}
             {isOpen && (
-                <div className="md:hidden bg-white border-b border-gray-100 animate-in slide-in-from-top duration-300">
-                    <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                        <Link to="/" className="block px-3 py-2 text-gray-600 hover:text-indigo-600">Home</Link>
-                        <Link to="/chat" className="block px-3 py-2 text-gray-600 hover:text-indigo-600">Assessment</Link>
-                        <Link to="/dashboard" className="block px-3 py-2 text-gray-600 hover:text-indigo-600">Dashboard</Link>
-                        <div className="px-3 py-2">
+                <div className="bg-white border-b" style={{ padding: '0.5rem 1rem' }}>
+                    <div className="flex flex-col gap-2">
+                        <div style={{ padding: '0.75rem' }}>
                             <SignedIn>
-                                <UserButton afterSignOutUrl="/" />
+                                <div className="flex flex-col gap-2">
+                                    <Link to="/chat" style={{ padding: '0.75rem', color: 'var(--text-secondary)' }}>Assessment</Link>
+                                    <Link to="/dashboard" style={{ padding: '0.75rem', color: 'var(--text-secondary)' }}>Dashboard</Link>
+                                    <div style={{ padding: '0.75rem' }}>
+                                        <UserButton afterSignOutUrl="/" />
+                                    </div>
+                                </div>
                             </SignedIn>
                             <SignedOut>
                                 <SignInButton mode="modal">
-                                    <button className="w-full bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+                                    <button className="accessible-button bg-primary text-white w-full">
                                         Sign In
                                     </button>
                                 </SignInButton>
@@ -77,14 +87,19 @@ const Navbar = () => {
 
 const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
-        <div className="min-h-screen bg-white">
+        <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
             <Navbar />
-            <main className="pt-16">
+            <main style={{ flex: '1', paddingTop: '64px' }}>
                 {children}
             </main>
-            <footer className="bg-gray-50 border-t border-gray-100 py-12">
-                <div className="max-w-7xl mx-auto px-4 text-center text-gray-500">
-                    <p>© 2025 Chaitanya AI. Tailored for Indian Communities.</p>
+            <footer className="border-b" style={{ backgroundColor: '#f9f9f9', padding: '3rem 1rem', borderTop: '1px solid var(--border-light)' }}>
+                <div className="max-w-7xl text-center" style={{ margin: '0 auto' }}>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+                        © 2025 Chaitanya AI. Empowering minds with care and technology.
+                    </p>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: '0.5rem' }}>
+                        Tailored for Indian Communities.
+                    </p>
                 </div>
             </footer>
         </div>
