@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { TrendingUp, Activity, Users, Calendar, ArrowUpRight } from 'lucide-react';
 
 const DashboardPage = () => {
@@ -41,13 +41,16 @@ const DashboardPage = () => {
                     <div className="lg:col-span-2 bg-white p-8 rounded-2xl border border-gray-100 shadow-sm min-h-[400px]">
                         <div className="flex justify-between items-center mb-6">
                             <h3 className="text-xl font-bold text-gray-900">Cognitive Trend</h3>
-                            <select className="bg-gray-50 border-none rounded-lg text-sm px-3 py-2">
-                                <option>Last 30 Days</option>
-                                <option>Last 3 Months</option>
-                            </select>
+                            <a
+                                href="/assessment"
+                                className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors shadow-sm"
+                            >
+                                Start New Assessment
+                            </a>
                         </div>
-                        <div className="flex items-center justify-center h-full text-gray-400">
-                            [Trend Visualization Placeholder]
+                        <div className="flex items-center justify-center h-full text-gray-400 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                            <TrendingUp className="h-12 w-12 text-gray-300 mb-2" />
+                            <span className="block w-full text-center">Trend Visualization Coming Soon</span>
                         </div>
                     </div>
 
