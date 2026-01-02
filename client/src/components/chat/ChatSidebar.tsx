@@ -1,6 +1,6 @@
 import { Plus, MessageSquare, Calendar, Loader2, ArrowLeft, Trash2, Search, Pencil, Check, X } from 'lucide-react';
 import { motion } from 'framer-motion';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@clerk/clerk-react';
 
 interface ChatHistoryItem {

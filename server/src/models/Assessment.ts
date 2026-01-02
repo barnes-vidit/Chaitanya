@@ -9,7 +9,7 @@ const ResponseSchema = new mongoose.Schema({
 });
 
 const AssessmentSchema = new mongoose.Schema({
-    patientId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    patientId: { type: String, ref: 'User', required: true },
     type: { type: String, enum: ['MMSE', 'MoCA', 'GDS', 'Custom'], required: true },
     status: { type: String, enum: ['in-progress', 'completed', 'reviewed'], default: 'in-progress' },
     responses: [ResponseSchema],

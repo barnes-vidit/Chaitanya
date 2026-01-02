@@ -54,10 +54,14 @@ io.on('connection', (socket) => {
 
 import chatRoutes from './routes/chatRoutes.js';
 import assessmentRoutes from './routes/assessmentRoutes.js';
+// import authRoutes from './routes/authRoutes.js'; // Commented out until verified
+import dashboardRoutes from './routes/dashboardRoutes.js';
 
 // Routes
+// app.use('/api/auth', authRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/assessment', assessmentRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 app.get('/', (req, res) => {
     res.send('Chaitanya API is running');
