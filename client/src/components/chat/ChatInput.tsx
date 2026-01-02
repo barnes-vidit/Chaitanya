@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import type { KeyboardEvent, ChangeEvent } from 'react';
-import { Send, Mic, Paperclip, StopCircle, File } from 'lucide-react';
+import { Send, Mic, Paperclip, StopCircle } from 'lucide-react';
 
 interface ChatInputProps {
     onSendMessage: (message: string, type?: 'text' | 'file', fileMetadata?: any) => void;
