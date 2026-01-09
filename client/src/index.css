@@ -36,6 +36,20 @@
   }
 }
 
+/* Global Scroll Fix */
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  /* Prevent dragging/scrolling entire page */
+  background-color: #f9fafb;
+  /* gray-50 */
+}
+
 /* Custom Animations */
 @keyframes blob {
   0% {
@@ -55,8 +69,24 @@
   }
 }
 
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .animate-blob {
   animation: blob 7s infinite;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .animation-delay-2000 {

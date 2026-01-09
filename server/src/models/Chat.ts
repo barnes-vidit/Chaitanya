@@ -8,7 +8,14 @@ const MessageSchema = new mongoose.Schema({
     metadata: {
         fileUrl: String,
         duration: Number, // for audio
-        sentiment: String
+        sentiment: String,
+        suggestedTask: {
+            type: { type: String },
+            difficulty: String,
+            completed: Boolean
+        },
+        isTaskSuggestion: Boolean,
+        hidden: Boolean
     },
     timestamp: { type: Date, default: Date.now }
 });

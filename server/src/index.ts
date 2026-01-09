@@ -8,7 +8,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 
 // Load env vars
-dotenv.config();
+dotenv.config({ debug: true });
 
 // Force restart for env update
 const app = express();

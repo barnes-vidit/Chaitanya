@@ -1,6 +1,6 @@
 import { Plus, MessageSquare, Calendar, Loader2, ArrowLeft, Trash2, Search, Pencil, Check, X } from 'lucide-react';
 import { motion } from 'framer-motion';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@clerk/clerk-react';
 
 interface ChatHistoryItem {
@@ -14,11 +14,12 @@ interface ChatHistoryItem {
 interface ChatSidebarProps {
     isOpen: boolean;
     onClose: () => void;
+    chatId: string | null;
     onSelectChat: (id: string) => void;
     onNewChat: () => void;
 }
 
-const ChatSidebar = ({ isOpen, onClose, onSelectChat, onNewChat }: ChatSidebarProps) => {
+const ChatSidebar = ({ isOpen, onClose, chatId, onSelectChat, onNewChat }: ChatSidebarProps) => {
     const { getToken } = useAuth();
     const [history, setHistory] = useState<ChatHistoryItem[]>([]);
     const [loading, setLoading] = useState(true);
@@ -214,9 +215,11 @@ const ChatSidebar = ({ isOpen, onClose, onSelectChat, onNewChat }: ChatSidebarPr
                                                         onSelectChat(item._id);
                                                         if (window.innerWidth < 768) onClose();
                                                     }}
-                                                    className="w-full text-left px-3 py-3 rounded-xl text-text-primary hover:bg-gray-50 transition-colors flex items-center gap-3 pr-16 relative"
+                                                    className={`w-full text-left px-3 py-3 rounded-xl transition-colors flex items-center gap-3 pr-16 relative
+                                                        ${chatId === item._id ? 'bg-blue-50 text-blue-700 font-medium' : 'text-text-primary hover:bg-gray-50'}
+                                                    `}
                                                 >
-                                                    <MessageSquare className="h-4 w-4 text-gray-400 group-hover:text-primary transition-colors shrink-0" />
+                                                    <MessageSquare className={`h-4 w-4 shrink-0 transition-colors ${chatId === item._id ? 'text-blue-500' : 'text-gray-400 group-hover:text-primary'}`} />
                                                     <span className="truncate text-sm font-medium">
                                                         {item.title || `Chat ${new Date(item.lastMessageAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
                                                     </span>
