@@ -1,7 +1,18 @@
 import type { Response } from 'express';
 import type { AuthRequest } from '../middleware/auth.js';
+import mongoose from 'mongoose';
 import { Chat } from '../models/Chat.js';
 import { generateAIResponse } from '../services/aiService.js';
+import { Orchestrator } from '../brain/Orchestrator.js';
+
+let orchestratorInstance: Orchestrator | null = null;
+
+const getOrchestrator = () => {
+    if (!orchestratorInstance) {
+        orchestratorInstance = new Orchestrator();
+    }
+    return orchestratorInstance;
+};
 
 // @desc    Get all chats for a user
 // @route   GET /api/chat
@@ -61,7 +72,7 @@ export const createChat = async (req: AuthRequest, res: Response) => {
 // @access  Private
 export const sendMessage = async (req: AuthRequest, res: Response) => {
     try {
-        const { content, type, metadata } = req.body;
+        const { content, type, metadata, language } = req.body;
         const chatId = req.params.id;
 
         const chat = await Chat.findOne({
@@ -84,33 +95,42 @@ export const sendMessage = async (req: AuthRequest, res: Response) => {
         };
         chat.messages.push(userMessage as any);
 
-        // 2. Generate AI Response
-        // In a real app, we'd pass recent history as context
-        const aiResponseText = await generateAIResponse(content);
+        // 2. Orchestrator Processing (The "Brain")
+        const orchestrator = getOrchestrator();
+
+        const brainResponse = await orchestrator.processMessage(
+            req.user.id,
+            chatId,
+            content,
+            language || 'English'
+        );
 
         // 3. Add AI Message
         const aiMessage = {
-            senderId: req.user.id, // Using user ID for now as AI doesn't have a DB user. Or we can use a null/special ID. 
-            // Better: 'senderRole' distinguishes it. db schema expects valid ObjectId for senderId?
-            // Checking model... senderId is required and ref 'User'.
-            // Workaround: Use the user's ID but role='ai'. Or create a system user.
-            // Using user's ID for simplicity as schema enforces it.
+            senderId: req.user.id, // Using user ID as anchor, role distinguishes
             senderRole: 'ai',
-            content: aiResponseText,
-            timestamp: new Date()
+            content: brainResponse.reply,
+            timestamp: new Date(),
+            metadata: {
+                ...brainResponse.metadata,
+                isTaskSuggestion: !!brainResponse.metadata.suggestedTask
+            }
         };
         chat.messages.push(aiMessage as any);
 
         chat.lastMessageAt = new Date();
         await chat.save();
 
-        // Return the NEW messages (or the whole chat, or just the new ones)
-        // Returning the last two messages (User + AI)
+        // Return the NEW messages
         const newMessages = chat.messages.slice(-2);
-
         res.json(newMessages);
 
-    } catch (error) {
+    } catch (error: any) {
+        console.error("Chat Controller Error:", error);
+        // Handle API Key missing error specifically
+        if (error.message && error.message.includes("GEMINI_API_KEY")) {
+            return res.status(500).json({ message: "AI Configuration Error: Missing API Key" });
+        }
         res.status(500).json({ message: 'Server Error', error });
     }
 };
@@ -156,5 +176,93 @@ export const updateChat = async (req: AuthRequest, res: Response) => {
     } catch (error) {
         console.error('Error updating chat:', error);
         res.status(500).json({ message: 'Failed to update chat' });
+    }
+};
+
+// @desc    Handle Task Completion & Generate Follow-up
+// @route   POST /api/chat/:id/task-result
+// @access  Private
+export const handleTaskResult = async (req: AuthRequest, res: Response) => {
+    try {
+        const { taskType, score, data, sourceMessageId } = req.body;
+        const chatId = req.params.id;
+
+        const chat = await Chat.findOne({
+            _id: chatId,
+            participants: req.user.id
+        });
+
+        if (!chat) {
+            return res.status(404).json({ message: 'Chat not found' });
+        }
+
+        // 0. Update original suggestion message if ID provided
+        if (sourceMessageId) {
+            try {
+                // Determine if it's a valid ObjectId to prevent CastError
+                const isValidId = mongoose.Types.ObjectId.isValid(sourceMessageId);
+                if (isValidId) {
+                    const suggestionMsg = chat.messages.id(sourceMessageId);
+                    if (suggestionMsg && suggestionMsg.metadata && suggestionMsg.metadata.suggestedTask) {
+                        suggestionMsg.metadata.suggestedTask.completed = true;
+                    }
+                } else {
+                    console.warn(`Invalid sourceMessageId provided: ${sourceMessageId}. Skipping status update.`);
+                }
+            } catch (err) {
+                console.warn("Failed to find/update source message:", err);
+            }
+        }
+
+        // 1. Log the User's "Submission"
+        const userMessage = {
+            senderId: req.user.id,
+            senderRole: 'user',
+            content: `[Completed Activity]`,
+            type: 'text',
+            metadata: { hidden: true },
+            timestamp: new Date()
+        };
+        chat.messages.push(userMessage as any);
+
+        // 2. Orchestrator Processing
+        const orchestrator = getOrchestrator();
+        let brainResponse: any;
+
+        try {
+            brainResponse = await orchestrator.handleTaskCompletion(
+                req.user.id,
+                chatId,
+                taskType,
+                Number(score), // Ensure number
+                data || {}
+            );
+        } catch (orchError) {
+            console.error("Orchestrator Task Completion Error:", orchError);
+            // Fallback response if Orchestrator fails
+            brainResponse = {
+                reply: "Great job completing the task! I've noted your results.",
+                metadata: {}
+            };
+        }
+
+        // 3. Add AI Follow-up
+        const aiMessage = {
+            senderId: req.user.id,
+            senderRole: 'ai',
+            content: brainResponse.reply,
+            timestamp: new Date(),
+            metadata: brainResponse.metadata
+        };
+        chat.messages.push(aiMessage as any);
+
+        chat.lastMessageAt = new Date();
+        await chat.save();
+
+        res.json(chat.messages.slice(-2));
+
+    } catch (error) {
+        console.error("Task Result API Error:", error);
+        res.status(500).json({ message: 'Server Error processing task result', error: String(error) });
     }
 };

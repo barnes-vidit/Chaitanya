@@ -21,24 +21,24 @@ const MessageBubble = ({ message, sender, timestamp, attachments }: MessageBubbl
         <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className={`flex w-full mb-8 ${isAi ? 'justify-start' : 'justify-end'}`}
+            className={`flex w-full mb-4 ${isAi ? 'justify-start' : 'justify-end'}`}
         >
-            <div className={`flex max-w-[90%] md:max-w-[75%] lg:max-w-[65%] gap-4 ${isAi ? 'flex-row' : 'flex-row-reverse'}`}>
+            <div className={`flex gap-3 ${isAi ? 'flex-row max-w-full' : 'flex-row-reverse max-w-[85%] md:max-w-[75%]'}`}>
                 {/* Avatar */}
                 <div className={`
-                    w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm transition-transform hover:scale-105 cursor-default
+                    w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm transition-transform hover:scale-105 cursor-default mt-1
                     ${isAi ? 'bg-white text-primary ring-1 ring-gray-100' : 'bg-primary text-white'}
                 `}>
-                    {isAi ? <Sparkles className="w-5 h-5" /> : <User className="w-5 h-5" />}
+                    {isAi ? <Sparkles className="w-4 h-4" /> : <User className="w-4 h-4" />}
                 </div>
 
                 {/* Bubble Content */}
-                <div className="flex flex-col gap-1.5">
+                <div className={`flex flex-col gap-1 min-w-0 ${isAi ? 'items-start' : 'items-end'}`}>
                     <div className={`
-                        p-5 md:p-6 rounded-[2rem] shadow-sm text-base md:text-lg leading-relaxed font-sans
+                        rounded-2xl text-base leading-relaxed font-sans text-left break-words
                         ${isAi
-                            ? 'bg-white text-text-primary rounded-tl-none border border-gray-100 shadow-soft'
-                            : 'bg-primary text-white rounded-tr-none shadow-md'
+                            ? 'bg-transparent text-text-primary px-0 py-1' // AI: No bg, minimal padding
+                            : 'bg-primary text-white py-2 px-3 rounded-br-sm shadow-md shadow-primary/20' // User: tighter padding
                         }
                     `}>
                         {message}
@@ -61,8 +61,8 @@ const MessageBubble = ({ message, sender, timestamp, attachments }: MessageBubbl
 
                     {/* Timestamp */}
                     <span className={`
-                        text-xs font-medium px-2 tracking-wide opacity-70
-                        ${isAi ? 'text-text-secondary text-left' : 'text-text-secondary text-right'}
+                        text-[10px] font-medium tracking-wide opacity-50
+                        ${isAi ? 'pl-0' : 'pr-1'}
                     `}>
                         {timestamp}
                     </span>

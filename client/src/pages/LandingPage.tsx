@@ -1,12 +1,62 @@
+import React, { useEffect, useRef } from 'react';
 import { SignedIn, SignedOut, SignInButton } from '@clerk/clerk-react';
 import { Link } from 'react-router-dom';
 import { Brain, Heart, Shield } from 'lucide-react';
 
 const LandingPage = () => {
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const container = containerRef.current;
+        if (!container) return;
+
+        let frameId: number;
+        const handleMouseMove = (e: MouseEvent) => {
+            if (frameId) {
+                cancelAnimationFrame(frameId);
+            }
+
+            frameId = requestAnimationFrame(() => {
+                const rect = container.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                container.style.setProperty('--mouse-x', `${x}px`);
+                container.style.setProperty('--mouse-y', `${y}px`);
+            });
+        };
+
+        window.addEventListener('mousemove', handleMouseMove);
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+            if (frameId) cancelAnimationFrame(frameId);
+        };
+    }, []);
+
     return (
-        <div className="overflow-hidden">
+        <div
+            ref={containerRef}
+            className="overflow-hidden"
+            style={{
+                background: `
+                    radial-gradient(
+                        circle 600px at var(--mouse-x, -100%) var(--mouse-y, -100%), 
+                        rgba(93, 173, 226, 0.12), 
+                        transparent 80%
+                    ),
+                    linear-gradient(to bottom, #EBF5FB, var(--white), #f9f9f9)
+                `,
+                transition: 'background 0.3s ease-out'
+            }}
+        >
             {/* Hero Section */}
-            <section className="relative py-20 overflow-hidden" style={{ background: 'linear-gradient(to bottom, #EBF5FB, var(--white))', minHeight: '80vh', display: 'flex', alignItems: 'center' }}>
+            <section
+                className="relative py-20 overflow-hidden"
+                style={{
+                    minHeight: '80vh',
+                    display: 'flex',
+                    alignItems: 'center',
+                }}
+            >
                 <div className="max-w-7xl px-4 relative z-10 text-center">
                     <h1 className="text-5xl" style={{ fontWeight: '800', color: 'var(--text-primary)', marginBottom: '1.5rem', lineHeight: '1.1', fontSize: 'clamp(2.5rem, 8vw, 4.5rem)' }}>
                         "Babumoshai, zindagi badi honi chahiye, <br />
@@ -48,7 +98,7 @@ const LandingPage = () => {
             </section>
 
             {/* Features Section */}
-            <section className="py-20 bg-white">
+            <section className="py-20" style={{ backgroundColor: 'transparent' }}>
                 <div className="max-w-7xl px-4">
                     <div className="text-center" style={{ marginBottom: '4rem' }}>
                         <h2 className="text-3xl" style={{ fontWeight: '700' }}>Designed for Every Indian Home</h2>
@@ -82,20 +132,36 @@ const LandingPage = () => {
 };
 
 const FeatureCard = ({ icon, title, description, accentColor }: { icon: React.ReactNode, title: string, description: string, accentColor: string }) => (
-    <div className="rounded-2xl border" style={{ padding: '2rem', transition: 'all 0.3s ease', cursor: 'default' }}
+    <div
+        className="rounded-2xl"
+        style={{
+            padding: '2.5rem',
+            transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+            cursor: 'default',
+            backgroundColor: 'rgba(255, 255, 255, 0.4)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)'
+        }}
         onMouseEnter={(e) => {
-            e.currentTarget.style.boxShadow = '0 20px 25px -5px rgba(0, 0, 0, 0.05)';
+            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.6)';
+            e.currentTarget.style.transform = 'translateY(-8px)';
+            e.currentTarget.style.boxShadow = `0 20px 25px -5px ${accentColor}15, 0 8px 10px -6px ${accentColor}10`;
             e.currentTarget.style.borderColor = accentColor;
         }}
         onMouseLeave={(e) => {
-            e.currentTarget.style.boxShadow = 'none';
-            e.currentTarget.style.borderColor = 'var(--border-light)';
-        }}>
-        <div style={{ width: '3.5rem', height: '3.5rem', backgroundColor: 'var(--bg-primary)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
+            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.4)';
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)';
+            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+        }}
+    >
+        <div style={{ width: '4rem', height: '4rem', backgroundColor: 'rgba(255, 255, 255, 0.6)', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem', boxShadow: 'inset 0 0 0 1px rgba(255, 255, 255, 0.3)' }}>
             <div className="flex justify-center w-full">{icon}</div>
         </div>
-        <h3 className="text-xl" style={{ marginBottom: '0.75rem' }}>{title}</h3>
-        <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>{description}</p>
+        <h3 className="text-xl" style={{ marginBottom: '1rem', fontWeight: '700' }}>{title}</h3>
+        <p style={{ color: 'var(--text-secondary)', lineHeight: '1.7', fontSize: '1.05rem' }}>{description}</p>
     </div>
 );
 

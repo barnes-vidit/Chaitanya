@@ -7,7 +7,7 @@ const Navbar = () => {
     const [isOpen, setIsOpen] = React.useState(false);
 
     return (
-        <nav className="fixed w-full z-50 bg-white border-b" style={{ top: 0, left: 0, backgroundColor: 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(8px)' }}>
+        <nav className="fixed w-full z-50 bg-white" style={{ top: 0, left: 0, backgroundColor: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(12px)' }}>
             <div className="max-w-7xl px-4" style={{ margin: '0 auto' }}>
                 <div className="flex justify-between items-center" style={{ height: '64px' }}>
                     <div className="flex items-center">
@@ -92,7 +92,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             <main style={{ flex: '1', paddingTop: '64px' }}>
                 {children}
             </main>
-            <footer className="border-b" style={{ backgroundColor: '#f9f9f9', padding: '3rem 1rem', borderTop: '1px solid var(--border-light)' }}>
+            <footer style={{ backgroundColor: 'rgba(250, 250, 250, 0.5)', padding: '3rem 1rem', backdropFilter: 'blur(8px)' }}>
                 <div className="max-w-7xl text-center" style={{ margin: '0 auto' }}>
                     <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
                         © 2025 Chaitanya AI. Empowering minds with care and technology.
