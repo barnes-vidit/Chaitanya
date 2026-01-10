@@ -8,9 +8,12 @@ import ActionCard from '../components/dashboard/ActionCard';
 import RecentActivityList from '../components/dashboard/RecentActivityList';
 import { User, Bell, AlertTriangle } from 'lucide-react';
 
+import { useNavigate } from 'react-router-dom';
+
 const DashboardPage = () => {
     const { getToken, isLoaded } = useAuth();
     const { user } = useUser();
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState<any>(null);
 
@@ -149,13 +152,13 @@ const DashboardPage = () => {
                         <ActionCard
                             title="Memory Test"
                             subtitle="Start a new standardized assessment."
-                            onClick={() => window.location.href = '/assessment'}
+                            onClick={() => navigate('/assessment')}
                         />
 
                         <ActionCard
                             title="Chat with AI"
                             subtitle="Start a new conversation session."
-                            onClick={() => window.location.href = '/chat'}
+                            onClick={() => navigate('/chat')}
                         />
 
                         <div className="bg-[#1E293B] rounded-3xl p-6 text-white relative overflow-hidden">

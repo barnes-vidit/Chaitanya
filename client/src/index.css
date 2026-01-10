@@ -44,8 +44,8 @@ body,
   width: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden;
-  /* Prevent dragging/scrolling entire page */
+  overflow-y: auto;
+  /* Allow scrolling */
   background-color: #f9fafb;
   /* gray-50 */
 }

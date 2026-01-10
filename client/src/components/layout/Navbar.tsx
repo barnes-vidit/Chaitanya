@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { SignedIn, SignedOut, UserButton, SignInButton } from '@clerk/clerk-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import Logo from '../common/Logo';
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
+    const location = useLocation();
+    const isHome = location.pathname === '/';
 
     useEffect(() => {
         const handleScroll = () => {
@@ -18,10 +20,14 @@ const Navbar = () => {
 
     return (
         <nav
-            className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-4 px-4"
+            className={`fixed top-0 left-0 right-0 z-50 flex justify-center pt-4 px-4 transition-all duration-300 ${!isHome ? 'bg-[#F0F4F8] shadow-sm pt-0 px-0' : ''}`}
         >
             <div
-                className="w-full max-w-7xl rounded-full transition-all duration-500 ease-out flex justify-between items-center bg-transparent border-transparent py-5 px-6"
+                className={`w-full max-w-7xl rounded-full transition-all duration-500 ease-out flex justify-between items-center py-5 px-6 
+                ${isHome
+                        ? (scrolled ? 'bg-black/20 backdrop-blur-md border border-white/10 shadow-lg' : 'bg-transparent border-transparent')
+                        : 'bg-[#1E293B] rounded-none w-full max-w-full px-8 md:px-12 shadow-md' // Full width dark bar on dashboard/other pages
+                    }`}
             >
                 {/* Logo Section */}
                 <div className="flex items-center">
