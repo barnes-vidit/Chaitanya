@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useAuth, useUser } from '@clerk/clerk-react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import { User, Bell, Sparkles, Activity, Brain, ArrowRight } from 'lucide-react';
+
 import CircularProgress from '../components/dashboard/CircularProgress';
-import PulseRateCard from '../components/dashboard/PulseRateCard';
+import CognitiveProfileCard from '../components/dashboard/CognitiveProfileCard';
 import CognitiveTrendChart from '../components/dashboard/CognitiveTrendChart';
 import ActionCard from '../components/dashboard/ActionCard';
 import RecentActivityList from '../components/dashboard/RecentActivityList';
-import { User, Bell, AlertTriangle } from 'lucide-react';
-
-import { useNavigate } from 'react-router-dom';
+import EmptyState from '../components/dashboard/EmptyState';
 
 const DashboardPage = () => {
     const { getToken, isLoaded } = useAuth();
@@ -22,7 +23,7 @@ const DashboardPage = () => {
             if (!isLoaded) return;
             try {
                 const token = await getToken();
-                const response = await fetch('http://localhost:5000/api/dashboard/stats', {
+                const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/dashboard/stats`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (response.ok) {
@@ -38,152 +39,163 @@ const DashboardPage = () => {
         fetchStats();
     }, [isLoaded, getToken]);
 
-    // --- DATA CORRELATION LOGIC ---
-    // 1. Memory Retention (Circular Progress)
-    // Correlates with average assessment score. 
-    // If no assessments, default to 0 to encourage taking one.
-    const hasAssessments = stats?.stats?.totalAssessments > 0;
+    // Data Processing
+    const hasData = stats?.stats?.totalAssessments > 0;
     const avgScore = stats?.stats?.avgScore || 0;
-    const memoryPercentage = hasAssessments ? Math.round((avgScore / 30) * 100) : 0;
-
-    // 2. Risk Calculation based on Assessment Scores
-    // MMSE Scoring: <24 is abnormal/risk.
-    let riskLevel = "Low";
-    if (hasAssessments) {
-        if (avgScore < 10) riskLevel = "Severe";
-        else if (avgScore < 20) riskLevel = "Moderate";
-        else if (avgScore < 25) riskLevel = "Mild";
-    }
-
-    // 3. Pulse Rate (Placeholder -> Future: Wearable Integration)
-    const pulseRate = 72;
+    const memoryPercentage = stats?.stats?.profile?.memory || 0;
+    const riskLevel = stats?.stats?.riskScore || "Low";
 
     if (loading) {
         return (
-            <div className="flex h-screen items-center justify-center bg-[#F0F4F8]">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500"></div>
+            <div className="flex h-screen items-center justify-center bg-[#0a0a0a]">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-[#F0F4F8] p-4 md:p-8 font-sans">
-            <div className="max-w-7xl mx-auto">
-                {/* Header */}
-                <header className="flex justify-between items-center mb-10">
-                    <div>
-                        <h1 className="text-3xl font-bold text-slate-800">Hello, {user?.firstName || 'User'}!</h1>
-                        <p className="text-slate-500">
-                            Risk Status: <span className={`font-bold ${riskLevel === 'Low' ? 'text-teal-600' : 'text-red-500'}`}>{riskLevel}</span>
+        <div className="min-h-screen bg-[#050505] text-white p-4 md:p-8 font-sans pt-24 overflow-x-hidden">
+            {/* Vibrant Background Ambience */}
+            <div className="fixed inset-0 pointer-events-none">
+                <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-900/20 rounded-full blur-[120px]" />
+                <div className="absolute top-[20%] right-[-10%] w-[40%] h-[40%] bg-purple-900/20 rounded-full blur-[100px]" />
+                <div className="absolute bottom-[-10%] left-[20%] w-[40%] h-[40%] bg-teal-900/10 rounded-full blur-[100px]" />
+                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20" />
+            </div>
+
+            <div className="max-w-7xl mx-auto space-y-8 relative z-10">
+
+                {/* 1. Hero Welcome Banner */}
+                <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="rounded-[2.5rem] p-8 md:p-10 flex flex-col md:flex-row justify-between items-center gap-6 relative overflow-hidden border border-white/10 bg-[#121212]/50 backdrop-blur-2xl shadow-xl"
+                >
+                    <div className="z-10">
+                        <h1 className="text-4xl md:text-5xl font-bold mb-3 tracking-tight text-white">
+                            Good {new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 18 ? 'Afternoon' : 'Evening'}, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">{user?.firstName}</span>
+                        </h1>
+                        <p className="text-gray-300 text-lg max-w-xl font-light leading-relaxed">
+                            Ready to strengthen your mind today? Your cognitive health looks <span className={`font-semibold ${riskLevel === 'Low' ? 'text-teal-400' : 'text-rose-400'}`}>{riskLevel} Risk</span>.
                         </p>
                     </div>
-                    <div className="flex gap-4">
-                        <button className="p-3 bg-white rounded-full shadow-sm hover:shadow-md transition-shadow relative">
-                            <Bell className="h-6 w-6 text-slate-600" />
-                            {riskLevel !== 'Low' && <span className="absolute top-0 right-0 h-3 w-3 bg-red-500 rounded-full border-2 border-white"></span>}
-                        </button>
-                        <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-full shadow-sm">
-                            <span className="text-sm font-medium text-slate-700">{user?.fullName}</span>
-                            <div className="h-8 w-8 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600">
-                                <User className="h-4 w-4" />
-                            </div>
-                        </div>
-                    </div>
-                </header>
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                    {/* Left Column - Key Vitals */}
-                    <div className="lg:col-span-4 space-y-8">
-                        {/* Memory Retention Card (Real Data) */}
-                        <motion.div
-                            initial={{ y: 20, opacity: 0 }}
-                            animate={{ y: 0, opacity: 1 }}
-                            className="bg-white rounded-3xl p-8 shadow-sm border border-white/50 flex flex-col items-center justify-center relative overflow-hidden"
-                        >
-                            <h3 className="text-lg font-semibold text-slate-700 mb-6 w-full text-center">Memory Retention</h3>
-                            <CircularProgress
-                                value={memoryPercentage}
-                                label={hasAssessments ? "Score" : "No Data"}
-                                subLabel={hasAssessments ? "Based on MMSE" : "Take a Test"}
-                                size={220}
-                                color={memoryPercentage > 70 ? "#2DD4BF" : memoryPercentage > 40 ? "#FACC15" : "#F87171"} // Color coding based on risk
-                            />
-                            {/* Background Decorations */}
-                            <div className={`absolute top-0 right-0 w-32 h-32 rounded-full -mr-16 -mt-16 z-0 ${memoryPercentage > 70 ? 'bg-teal-50' : 'bg-red-50'}`}></div>
-                            <div className="absolute bottom-0 left-0 w-24 h-24 bg-indigo-50 rounded-full -ml-12 -mb-12 z-0"></div>
-                        </motion.div>
-
-                        {/* Pulse Rate Card */}
-                        <motion.div
-                            initial={{ y: 20, opacity: 0 }}
-                            animate={{ y: 0, opacity: 1 }}
-                            transition={{ delay: 0.1 }}
-                        >
-                            <PulseRateCard bpm={pulseRate} />
-                        </motion.div>
-
-                        {/* Risk Indicator Card */}
-                        <div className={`rounded-3xl p-6 text-white shadow-lg ${riskLevel === 'Low' ? 'bg-teal-500' : 'bg-red-500'}`}>
-                            <div className="flex items-center gap-3 mb-2">
-                                <AlertTriangle className="h-6 w-6" />
-                                <h3 className="font-bold text-lg">Health Status</h3>
-                            </div>
-                            <p className="opacity-90">
-                                {riskLevel === 'Low'
-                                    ? "Your cognitive health is stable. Keep it up!"
-                                    : "Declining trends detected. Consult a doctor."}
+                    <div className="flex gap-6 z-10 items-center">
+                        <div className="hidden md:block text-right">
+                            <p className="text-xs text-blue-300/60 font-medium uppercase tracking-widest mb-1">Daily Streak</p>
+                            <p className="text-3xl font-bold text-white flex items-center justify-end gap-2">
+                                <Sparkles className="w-6 h-6 text-amber-400" fill="currentColor" /> 3 <span className="text-lg font-normal text-white/50">Days</span>
                             </p>
                         </div>
+                        <div className="h-12 w-[1px] bg-white/10 hidden md:block"></div>
+                        <button className="p-4 bg-white/5 border border-white/10 rounded-full hover:bg-white/10 transition-all relative group">
+                            <Bell className="h-6 w-6 text-gray-400 group-hover:text-white transition-colors" />
+                            {riskLevel === 'High' && <span className="absolute top-3 right-3 h-2 w-2 bg-rose-500 rounded-full shadow-[0_0_10px_rgba(244,63,94,0.5)]"></span>}
+                        </button>
                     </div>
 
-                    {/* Middle Column - Charts & Activity */}
-                    <div className="lg:col-span-5 space-y-8">
-                        {/* Real Trend Chart */}
+                    {/* Abstract Shapes Background */}
+                    <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-[80px] -mr-32 -mt-32 pointer-events-none"></div>
+                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-teal-500/5 rounded-full blur-[60px] -ml-20 -mb-20 pointer-events-none"></div>
+                </motion.div>
+
+                {/* 2. Bento Grid Layout */}
+                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+
+                    {/* COL 1: Key Metrics (Memory & Profile) */}
+                    <div className="space-y-6 lg:col-span-1">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: 0.1 }}
+                            className="bg-[#121212] rounded-[2rem] p-6 border border-white/5 relative overflow-hidden group hover:border-white/10 transition-colors shadow-lg"
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <h3 className="text-gray-400 font-bold text-xs mb-6 uppercase tracking-[0.2em] text-center">Memory Score</h3>
+                            <div className="flex justify-center py-2 relative z-10">
+                                <CircularProgress
+                                    value={memoryPercentage}
+                                    label={hasData ? `${Math.round(memoryPercentage)}%` : "N/A"}
+                                    subLabel=""
+                                    size={180}
+                                    color={memoryPercentage > 75 ? "#2dd4bf" : memoryPercentage > 50 ? "#facc15" : "#f43f5e"}
+                                    trackColor="#262626"
+                                />
+                            </div>
+                        </motion.div>
+
+                        <div className="bg-[#121212] rounded-[2rem] p-6 border border-white/5 shadow-lg">
+                            <CognitiveProfileCard profile={stats?.stats?.profile || { memory: 0, attention: 0, language: 0 }} />
+                        </div>
+                    </div>
+
+                    {/* COL 2: Main Activity Feed & Chart (Span 2) */}
+                    <div className="space-y-6 md:col-span-2 lg:col-span-2">
+                        {/* Trend Chart */}
                         <CognitiveTrendChart data={stats?.trends?.cognitive} />
 
-                        {/* Real Recent Activity */}
+                        {/* Recent Timeline */}
                         <RecentActivityList activities={stats?.recentActivity || []} />
                     </div>
 
-                    {/* Right Column - Actions */}
-                    <div className="lg:col-span-3 space-y-6">
-                        <h3 className="text-xl font-bold text-slate-800 mb-4">Actions</h3>
+                    {/* COL 3: Quick Actions */}
+                    <div className="space-y-6 lg:col-span-1">
+                        <div>
+                            <h3 className="font-bold text-white/90 text-lg mb-4 flex items-center gap-2">
+                                <span className="w-1 h-6 bg-gradient-to-b from-blue-500 to-indigo-600 rounded-full"></span>
+                                Start Activity
+                            </h3>
+                            <div className="space-y-3">
+                                <button
+                                    onClick={() => navigate('/chat')}
+                                    className="w-full bg-gradient-to-r from-indigo-600 to-violet-600 text-white p-4 rounded-2xl shadow-lg shadow-indigo-900/20 hover:shadow-indigo-600/40 hover:scale-[1.02] transition-all flex items-center justify-between group border border-indigo-400/20"
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <div className="p-2.5 bg-white/10 rounded-xl backdrop-blur-sm">
+                                            <Brain className="w-5 h-5 text-white" />
+                                        </div>
+                                        <div className="text-left">
+                                            <p className="font-bold text-sm">Memory Test</p>
+                                            <p className="text-xs text-indigo-200">Start Assessment</p>
+                                        </div>
+                                    </div>
+                                    <ArrowRight className="w-5 h-5 text-white/50 group-hover:translate-x-1 group-hover:text-white transition-all" />
+                                </button>
 
-                        <ActionCard
-                            title="Memory Test"
-                            subtitle="Start a new standardized assessment."
-                            onClick={() => navigate('/assessment')}
-                        />
-
-                        <ActionCard
-                            title="Chat with AI"
-                            subtitle="Start a new conversation session."
-                            onClick={() => navigate('/chat')}
-                        />
-
-                        <div className="bg-[#1E293B] rounded-3xl p-6 text-white relative overflow-hidden">
-                            <h4 className="font-bold mb-2 relative z-10">Caregiver Tips</h4>
-                            <p className="text-sm text-slate-400 relative z-10">
-                                {riskLevel === 'Low'
-                                    ? "Routine is key. Try to keep a consistent schedule."
-                                    : "Monitor sleep patterns and daily water intake closely."}
-                            </p>
-                            <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/20 rounded-full blur-xl"></div>
+                                <button
+                                    onClick={() => navigate('/chat')}
+                                    className="w-full bg-[#1A1B2E] text-blue-100 p-4 rounded-2xl border border-white/5 hover:bg-[#232438] hover:border-white/10 transition-all flex items-center justify-between group"
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <div className="p-2.5 bg-teal-500/10 rounded-xl">
+                                            <Sparkles className="w-5 h-5 text-teal-400" />
+                                        </div>
+                                        <div className="text-left">
+                                            <p className="font-bold text-sm">Chat Companion</p>
+                                            <p className="text-xs text-slate-500 group-hover:text-slate-400">Casual Conversation</p>
+                                        </div>
+                                    </div>
+                                </button>
+                            </div>
                         </div>
 
-                        {/* Stats Summary */}
-                        <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                            <h4 className="font-bold text-slate-700 mb-4">Summary</h4>
-                            <div className="flex justify-between items-center mb-2">
-                                <span className="text-slate-500 text-sm">Total Tests</span>
-                                <span className="font-bold text-slate-800">{stats?.stats?.totalAssessments || 0}</span>
+                        {/* Recommendation Card */}
+                        <div className="bg-gradient-to-br from-[#1E293B] to-[#0F172A] rounded-[2rem] p-6 border border-white/5 relative overflow-hidden group">
+                            <div className="flex items-center gap-2 mb-4">
+                                <div className="p-1.5 bg-emerald-500/10 rounded-lg">
+                                    <Activity className="w-4 h-4 text-emerald-400" />
+                                </div>
+                                <h4 className="font-bold text-sm uppercase tracking-wider text-emerald-400">Daily Tip</h4>
                             </div>
-                            <div className="flex justify-between items-center">
-                                <span className="text-slate-500 text-sm">Avg Score</span>
-                                <span className="font-bold text-slate-800">{avgScore.toFixed(1)}/30</span>
-                            </div>
+                            <p className="text-sm text-slate-300 relative z-10 leading-relaxed font-light">
+                                {riskLevel === 'Low'
+                                    ? "Great coherence in your last session! Try reading a short article today to boost recall."
+                                    : "We noticed some hesitation. Drink water and try a quick breathing exercise before your next chat."}
+                            </p>
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-[40px] -mr-10 -mt-10 group-hover:bg-emerald-500/20 transition-colors"></div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>

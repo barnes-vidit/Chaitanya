@@ -20,7 +20,7 @@ const AssessmentPage = () => {
         try {
             const token = await getToken();
             // Start assessment on backend
-            const res = await fetch('http://localhost:5000/api/assessment/start', {
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/assessment/start`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -67,7 +67,7 @@ const AssessmentPage = () => {
         try {
             if (activeId) {
                 const token = await getToken();
-                await fetch(`http://localhost:5000/api/assessment/${activeId}/submit`, {
+                await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/assessment/${activeId}/submit`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

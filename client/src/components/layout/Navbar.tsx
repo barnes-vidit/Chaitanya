@@ -20,13 +20,13 @@ const Navbar = () => {
 
     return (
         <nav
-            className={`fixed top-0 left-0 right-0 z-50 flex justify-center pt-4 px-4 transition-all duration-300 ${!isHome ? 'bg-[#F0F4F8] shadow-sm pt-0 px-0' : ''}`}
+            className="fixed top-4 left-0 right-0 z-50 flex justify-center px-4 transition-all duration-300"
         >
             <div
-                className={`w-full max-w-7xl rounded-full transition-all duration-500 ease-out flex justify-between items-center py-5 px-6 
-                ${isHome
-                        ? (scrolled ? 'bg-black/20 backdrop-blur-md border border-white/10 shadow-lg' : 'bg-transparent border-transparent')
-                        : 'bg-[#1E293B] rounded-none w-full max-w-full px-8 md:px-12 shadow-md' // Full width dark bar on dashboard/other pages
+                className={`w-full max-w-7xl rounded-full transition-all duration-500 ease-out flex justify-between items-center py-4 px-6 border shadow-lg
+                ${scrolled || !isHome
+                        ? 'bg-[#0a0a0a]/80 backdrop-blur-xl border-white/10'
+                        : 'bg-transparent border-transparent'
                     }`}
             >
                 {/* Logo Section */}
@@ -41,7 +41,10 @@ const Navbar = () => {
                 {/* Desktop Menu - Centered links if we wanted, but keeping right aligned for standard feel */}
                 <div className="hidden md:flex items-center gap-8">
                     {['Home', 'Assessment', 'Dashboard'].map((item) => {
-                        const path = item === 'Home' ? '/' : `/${item.toLowerCase()}`;
+                        let path;
+                        if (item === 'Home') path = '/';
+                        else if (item === 'Assessment') path = '/chat';
+                        else path = `/${item.toLowerCase()}`;
                         if (item !== 'Home' && item !== 'Assessment' && item !== 'Dashboard') return null; // Safety
 
                         // Conditional rendering for auth routes

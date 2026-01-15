@@ -34,7 +34,14 @@ const SessionStateSchema = new mongoose.Schema({
         timestamp: { type: Date, default: Date.now }
     }],
 
-    lastInteraction: { type: Date, default: Date.now }
+    lastInteraction: { type: Date, default: Date.now },
+
+    // Conversation History (Short-term memory window)
+    history: [{
+        role: { type: String, enum: ['user', 'assistant', 'system'], required: true },
+        content: { type: String, required: true },
+        timestamp: { type: Date, default: Date.now }
+    }]
 }, { timestamps: true });
 
 export const SessionState = mongoose.model('SessionState', SessionStateSchema);

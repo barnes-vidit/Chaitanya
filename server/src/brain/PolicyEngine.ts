@@ -7,8 +7,7 @@ export class PolicyEngine {
         let output: PolicyOutput = {
             allowed_action: 'CHAT_ONLY',
             task_type: null,
-            difficulty: null,
-            next_stage: undefined
+            difficulty: null
         };
 
         // --- STATE MACHINE LOGIC ---
@@ -26,23 +25,28 @@ export class PolicyEngine {
                 // It's time to suggest a task!
                 output.allowed_action = 'SUGGEST_TASK';
 
-                // Which task?
-                if (tasksDoneToday === 0) {
-                    output.task_type = 'CLOCK_DRAWING';
-                    output.difficulty = 'EASY';
-                } else if (tasksDoneToday === 1) {
-                    output.task_type = 'MEMORY_RECALL';
-                    output.difficulty = 'EASY';
-                } else if (tasksDoneToday === 2) {
-                    output.task_type = 'ATTENTION';
+                // Available Tasks
+                const allTasks = ['CLOCK_DRAWING', 'MEMORY_RECALL', 'ATTENTION'];
+
+                // Filter out tasks already done in this session
+                const doneTypes = new Set(state.taskResults.map(r => r.taskType));
+                const available = allTasks.filter(t => !doneTypes.has(t));
+
+                if (available.length > 0) {
+                    // Pick random from available
+                    output.task_type = available[Math.floor(Math.random() * available.length)] || null;
                     output.difficulty = 'EASY';
                 } else {
-                    // All tasks done
+                    // All done? Reset or pick random from all (Repeats allowed)
+                    output.task_type = allTasks[Math.floor(Math.random() * allTasks.length)] || null;
+                    output.difficulty = 'EASY';
+                }
+
+                // If we have saturated tasks, maybe close?
+                if (state.tasksDoneToday >= 5) {
                     output.allowed_action = 'CHAT_ONLY';
                     output.next_stage = 'CLOSING';
                 }
-
-                // State should automatically transition to TASK_ACTIVE after suggestion handled by Orchestrator
                 break;
 
             case 'TASK_ACTIVE':

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Play, RotateCcw, AlertCircle, CheckCircle2, XCircle, Flame, Volume2, VolumeX } from 'lucide-react';
 
-export const AttentionTask = ({ onComplete }: { onComplete?: (result: any) => void }) => {
+export const AttentionTask = ({ onComplete, isDarkMode = false }: { onComplete?: (result: any) => void, isDarkMode?: boolean }) => {
     const [gameState, setGameState] = useState<'idle' | 'countdown' | 'running' | 'completed'>('idle');
     const [color, setColor] = useState('gray');
     const [targetColor, setTargetColor] = useState('bg-red-500');
@@ -101,19 +101,20 @@ export const AttentionTask = ({ onComplete }: { onComplete?: (result: any) => vo
         setGameState('countdown');
     };
 
+    // Timer End Check - Moved out of setState updater to prevent render-cycle errors
+    useEffect(() => {
+        if (timeLeft <= 0 && gameState === 'running') {
+            endGame();
+        }
+    }, [timeLeft, gameState]);
+
     const startGameLoop = () => {
         setTimeLeft(15);
         setColor('gray');
 
         // Game Timer
         gameInterval.current = setInterval(() => {
-            setTimeLeft((prev) => {
-                if (prev <= 1) {
-                    endGame();
-                    return 0;
-                }
-                return prev - 1;
-            });
+            setTimeLeft((prev) => Math.max(0, prev - 1));
         }, 1000);
 
         // Color Change Loop
@@ -196,11 +197,14 @@ export const AttentionTask = ({ onComplete }: { onComplete?: (result: any) => vo
     const targetDetails = COLORS.find(c => c.id === targetColor) || COLORS[0];
 
     return (
-        <div className="relative overflow-hidden p-8 bg-white rounded-3xl border border-gray-100 shadow-xl w-full max-w-xl mx-auto select-none transition-all duration-300 hover:shadow-2xl">
+        <div className={`
+            relative overflow-hidden p-8 rounded-3xl border shadow-xl w-full max-w-xl mx-auto select-none transition-all duration-300 hover:shadow-2xl
+            ${isDarkMode ? 'bg-[#1a1a1a] border-white/10' : 'bg-white border-gray-100'}
+        `}>
             {/* Header */}
             <div className="flex justify-between items-center mb-8">
-                <div className="flex items-center gap-3 text-gray-700">
-                    <div className="p-2.5 bg-orange-100/50 text-orange-600 rounded-xl">
+                <div className={`flex items-center gap-3 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <div className={`p-2.5 rounded-xl ${isDarkMode ? 'bg-orange-500/20 text-orange-400' : 'bg-orange-100/50 text-orange-600'}`}>
                         <AlertCircle size={24} />
                     </div>
                     <div className="flex flex-col">
@@ -220,12 +224,12 @@ export const AttentionTask = ({ onComplete }: { onComplete?: (result: any) => vo
                 <div className="flex items-center gap-3 min-h-[44px]">
                     <button
                         onClick={() => setSoundEnabled(!soundEnabled)}
-                        className="text-gray-400 hover:text-gray-600 transition-colors p-2 rounded-lg hover:bg-gray-100"
+                        className={`transition-colors p-2 rounded-lg ${isDarkMode ? 'text-gray-400 hover:text-white hover:bg-white/10' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'}`}
                     >
                         {soundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
                     </button>
                     <div className={`transition-opacity duration-300 ${gameState === 'running' ? 'opacity-100' : 'opacity-0'}`}>
-                        <div className="font-mono font-bold text-2xl text-primary bg-blue-50 px-0 py-2 rounded-xl w-24 text-center">
+                        <div className={`font-mono font-bold text-2xl px-0 py-2 rounded-xl w-24 text-center ${isDarkMode ? 'text-blue-400 bg-blue-500/10' : 'text-primary bg-blue-50'}`}>
                             {timeLeft}s
                         </div>
                     </div>
@@ -237,13 +241,13 @@ export const AttentionTask = ({ onComplete }: { onComplete?: (result: any) => vo
 
                 {/* Idle / Start State */}
                 {gameState === 'idle' && (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200 p-8 text-center z-10 transition-all">
-                        <p className="text-gray-600 mb-8 font-medium text-xl leading-relaxed">
-                            Tap the box <span className="font-bold text-gray-900">ONLY</span> when it matches the target color.
+                    <div className={`absolute inset-0 flex flex-col items-center justify-center rounded-3xl border-2 border-dashed p-8 text-center z-10 transition-all ${isDarkMode ? 'bg-[#121212] border-white/10' : 'bg-gray-50 border-gray-200'}`}>
+                        <p className={`mb-8 font-medium text-xl leading-relaxed ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                            Tap the box <span className={`font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>ONLY</span> when it matches the target color.
                         </p>
                         <button
                             onClick={handleStart}
-                            className="group relative inline-flex items-center gap-3 px-10 py-4 bg-gray-900 text-white rounded-2xl font-bold text-xl shadow-xl hover:bg-gray-800 hover:-translate-y-1 transition-all"
+                            className={`group relative inline-flex items-center gap-3 px-10 py-4 rounded-2xl font-bold text-xl shadow-xl transition-all hover:-translate-y-1 ${isDarkMode ? 'bg-white text-black hover:bg-gray-200' : 'bg-gray-900 text-white hover:bg-gray-800'}`}
                         >
                             <Play size={24} fill="currentColor" /> Start Game
                         </button>
@@ -252,12 +256,12 @@ export const AttentionTask = ({ onComplete }: { onComplete?: (result: any) => vo
 
                 {/* Countdown State - Show Target Instruction */}
                 {gameState === 'countdown' && (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-white rounded-3xl z-10 p-6 text-center border border-gray-100 shadow-sm">
+                    <div className={`absolute inset-0 flex flex-col items-center justify-center rounded-3xl z-10 p-6 text-center border shadow-sm ${isDarkMode ? 'bg-[#121212] border-white/10' : 'bg-white border-gray-100'}`}>
                         <p className="text-gray-400 font-bold tracking-widest uppercase mb-6 text-sm">Target Color</p>
                         <h2 className={`text-5xl font-black mb-10 ${targetDetails.text} tracking-wider scale-110`}>
                             {targetDetails.name}
                         </h2>
-                        <div className="text-8xl font-black text-gray-200 animate-pulse">
+                        <div className={`text-8xl font-black animate-pulse ${isDarkMode ? 'text-gray-700' : 'text-gray-200'}`}>
                             {countdown}
                         </div>
                     </div>
@@ -265,9 +269,9 @@ export const AttentionTask = ({ onComplete }: { onComplete?: (result: any) => vo
 
                 {/* Completed State */}
                 {gameState === 'completed' && (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/95 backdrop-blur-sm rounded-3xl z-20 animate-fade-in">
+                    <div className={`absolute inset-0 flex flex-col items-center justify-center backdrop-blur-sm rounded-3xl z-20 animate-fade-in ${isDarkMode ? 'bg-black/80' : 'bg-white/95'}`}>
                         <div className="text-center w-full px-6">
-                            <h4 className="text-2xl font-bold text-gray-800 mb-2">Time's Up!</h4>
+                            <h4 className={`text-2xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>Time's Up!</h4>
 
                             {Math.max(streak, maxStreak) > 3 && (
                                 <div className="mb-6 inline-flex items-center gap-2 px-3 py-1 bg-orange-100 text-orange-600 rounded-full text-sm font-bold animate-bounce-short">
@@ -276,11 +280,11 @@ export const AttentionTask = ({ onComplete }: { onComplete?: (result: any) => vo
                             )}
 
                             <div className="grid grid-cols-2 gap-4 mb-8">
-                                <div className="p-4 bg-green-50 rounded-2xl border border-green-100">
+                                <div className={`p-4 rounded-2xl border ${isDarkMode ? 'bg-green-500/10 border-green-500/20' : 'bg-green-50 border-green-100'}`}>
                                     <span className="block text-3xl font-bold text-green-600">{score.hits}</span>
                                     <span className="text-xs font-bold text-green-400 uppercase tracking-wider">Correct</span>
                                 </div>
-                                <div className="p-4 bg-red-50 rounded-2xl border border-red-100">
+                                <div className={`p-4 rounded-2xl border ${isDarkMode ? 'bg-red-500/10 border-red-500/20' : 'bg-red-50 border-red-100'}`}>
                                     <span className="block text-3xl font-bold text-red-500">{score.misses}</span>
                                     <span className="text-xs font-bold text-red-400 uppercase tracking-wider">Mistakes</span>
                                 </div>
@@ -288,7 +292,7 @@ export const AttentionTask = ({ onComplete }: { onComplete?: (result: any) => vo
 
                             <button
                                 onClick={handleStart}
-                                className="text-gray-500 hover:text-gray-800 font-medium flex items-center gap-2 mx-auto transition-colors hover:bg-gray-50 px-4 py-2 rounded-lg"
+                                className={`font-medium flex items-center gap-2 mx-auto transition-colors px-4 py-2 rounded-lg ${isDarkMode ? 'text-gray-400 hover:text-white hover:bg-white/10' : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50'}`}
                             >
                                 <RotateCcw size={16} /> Play Again
                             </button>
@@ -300,7 +304,7 @@ export const AttentionTask = ({ onComplete }: { onComplete?: (result: any) => vo
                 {gameState === 'running' && (
                     <>
                         {/* Persistent Target Indicator */}
-                        <div className="absolute top-4 right-4 z-20 pointer-events-none bg-white/80 backdrop-blur px-3 py-1 rounded-full text-xs font-bold border border-gray-100 shadow-sm transition-all">
+                        <div className={`absolute top-4 right-4 z-20 pointer-events-none backdrop-blur px-3 py-1 rounded-full text-xs font-bold border shadow-sm transition-all ${isDarkMode ? 'bg-black/50 border-white/10 text-gray-300' : 'bg-white/80 border-gray-100'}`}>
                             Target: <span className={targetDetails.text}>{targetDetails.name}</span>
                         </div>
 
@@ -309,7 +313,7 @@ export const AttentionTask = ({ onComplete }: { onComplete?: (result: any) => vo
                             onTouchStart={handleTap}
                             className={`
                                 w-full h-full rounded-3xl shadow-inner transition-all duration-100 transform active:scale-95
-                                ${color === 'gray' ? 'bg-gray-100' : color}
+                                ${color === 'gray' ? (isDarkMode ? 'bg-gray-800' : 'bg-gray-100') : color}
                                 flex items-center justify-center
                             `}
                         >
@@ -332,12 +336,12 @@ export const AttentionTask = ({ onComplete }: { onComplete?: (result: any) => vo
             {/* Footer / Instructions */}
             <div className="text-center h-6 flex items-center justify-center">
                 {gameState === 'idle' && (
-                    <p className="text-sm text-gray-400">
+                    <p className={`text-sm ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
                         Test your reflexes and attention span.
                     </p>
                 )}
                 {gameState === 'running' && (
-                    <p className="text-sm font-medium text-gray-500">
+                    <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                         Tap only on <span className={`font-bold ${targetDetails.text}`}>{targetDetails.name}</span>
                     </p>
                 )}

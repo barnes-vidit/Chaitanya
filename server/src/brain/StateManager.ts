@@ -26,6 +26,8 @@ export class StateManager {
                     tasksDoneToday: 0,
                     lastTaskType: null,
                     lastTaskTimestamp: null,
+                    turnsSinceLastTask: 0,
+                    history: [],
                     taskResults: []
                 };
             }
@@ -40,6 +42,8 @@ export class StateManager {
                 tasksDoneToday: state.tasksDoneToday,
                 lastTaskType: state.lastTaskType,
                 lastTaskTimestamp: state.lastTaskTimestamp,
+                turnsSinceLastTask: (state as any).turnsSinceLastTask || 0,
+                history: (state as any).history || [],
                 taskResults: (state as any).taskResults || []
             };
         } catch (error) {

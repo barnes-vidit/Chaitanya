@@ -21,7 +21,7 @@ interface MemoryRecallTaskProps {
     difficulty?: string;
 }
 
-export const MemoryRecallTask = ({ onComplete, difficulty = "Medium" }: MemoryRecallTaskProps) => {
+export const MemoryRecallTask = ({ onComplete, difficulty = "Medium", isDarkMode = false }: MemoryRecallTaskProps & { isDarkMode?: boolean }) => {
     // Game State
     const [phase, setPhase] = useState<'intro' | 'memorize' | 'hold' | 'select' | 'completed'>('intro');
     const [timeLeft, setTimeLeft] = useState(5);
@@ -138,22 +138,25 @@ export const MemoryRecallTask = ({ onComplete, difficulty = "Medium" }: MemoryRe
     };
 
     return (
-        <div className="relative overflow-hidden bg-white p-6 rounded-3xl border border-gray-100 shadow-xl w-full max-w-lg mx-auto transition-all">
+        <div className={`
+            relative overflow-hidden p-6 rounded-3xl border shadow-xl w-full max-w-lg mx-auto transition-all
+            ${isDarkMode ? 'bg-[#1a1a1a] border-white/10' : 'bg-white border-gray-100'}
+        `}>
 
             {/* Header */}
             <div className="flex justify-between items-center mb-6">
                 <div className="flex items-center gap-3">
-                    <div className="p-2.5 bg-purple-100 text-purple-600 rounded-xl">
+                    <div className={`p-2.5 rounded-xl ${isDarkMode ? 'bg-purple-500/20 text-purple-400' : 'bg-purple-100 text-purple-600'}`}>
                         <Brain size={24} />
                     </div>
                     <div>
-                        <h2 className="text-lg font-bold text-gray-800 leading-none">Word Spark</h2>
+                        <h2 className={`text-lg font-bold leading-none ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>Word Spark</h2>
                         <span className="text-xs font-semibold text-gray-400 uppercase tracking-widest">{difficulty}</span>
                     </div>
                 </div>
 
                 {(phase === 'memorize' || phase === 'hold') && (
-                    <div className="flex items-center gap-2 px-4 py-1.5 bg-purple-50 text-purple-600 rounded-full font-mono font-bold">
+                    <div className={`flex items-center gap-2 px-4 py-1.5 rounded-full font-mono font-bold ${isDarkMode ? 'bg-purple-500/20 text-purple-300' : 'bg-purple-50 text-purple-600'}`}>
                         <Clock size={16} /> {timeLeft}s
                     </div>
                 )}
@@ -165,17 +168,19 @@ export const MemoryRecallTask = ({ onComplete, difficulty = "Medium" }: MemoryRe
                 {/* INTRO */}
                 {phase === 'intro' && (
                     <div className="text-center max-w-xs animate-fade-in">
-                        <div className="bg-purple-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 text-purple-500">
+                        <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 ${isDarkMode ? 'bg-purple-500/10 text-purple-400' : 'bg-purple-50 text-purple-500'}`}>
                             <Sparkles size={40} />
                         </div>
-                        <h3 className="text-xl font-bold text-gray-800 mb-3">Ready to Spark?</h3>
-                        <p className="text-gray-500 mb-8 leading-relaxed">
-                            Memorize the <span className="font-bold text-purple-600">{config.targetCount} words</span> shown.
+                        <h3 className={`text-xl font-bold mb-3 ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>Ready to Spark?</h3>
+                        <p className={`mb-8 leading-relaxed ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                            Memorize the <span className={`font-bold ${isDarkMode ? 'text-purple-400' : 'text-purple-600'}`}>{config.targetCount} words</span> shown.
                             Then spot them in the crowd.
                         </p>
                         <button
                             onClick={startGame}
-                            className="w-full py-4 bg-gray-900 text-white rounded-xl font-bold shadow-lg hover:bg-gray-800 transform transition-all active:scale-95 flex items-center justify-center gap-2"
+                            className={`w-full py-4 rounded-xl font-bold shadow-lg transform transition-all active:scale-95 flex items-center justify-center gap-2
+                                ${isDarkMode ? 'bg-white text-black hover:bg-gray-200' : 'bg-gray-900 text-white hover:bg-gray-800'}
+                            `}
                         >
                             <Play size={20} fill="currentColor" /> Start
                         </button>
@@ -189,7 +194,9 @@ export const MemoryRecallTask = ({ onComplete, difficulty = "Medium" }: MemoryRe
                         <div className="flex flex-wrap justify-center gap-4">
                             {targetWords.map((word, i) => (
                                 <div key={i} className="animate-pop-in" style={{ animationDelay: `${i * 100}ms` }}>
-                                    <span className="inline-block px-6 py-3 bg-purple-100 text-purple-700 rounded-xl text-xl font-bold shadow-sm border border-purple-200">
+                                    <span className={`inline-block px-6 py-3 rounded-xl text-xl font-bold shadow-sm border 
+                                        ${isDarkMode ? 'bg-purple-500/20 text-purple-300 border-purple-500/30' : 'bg-purple-100 text-purple-700 border-purple-200'}
+                                    `}>
                                         {word}
                                     </span>
                                 </div>
@@ -201,7 +208,7 @@ export const MemoryRecallTask = ({ onComplete, difficulty = "Medium" }: MemoryRe
                 {/* HOLD */}
                 {phase === 'hold' && (
                     <div className="text-center animate-pulse">
-                        <p className="text-2xl font-bold text-gray-300">Hold it...</p>
+                        <p className={`text-2xl font-bold ${isDarkMode ? 'text-gray-600' : 'text-gray-300'}`}>Hold it...</p>
                     </div>
                 )}
 
@@ -221,17 +228,18 @@ export const MemoryRecallTask = ({ onComplete, difficulty = "Medium" }: MemoryRe
                                 let baseClass = "h-14 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center justify-center border-2 ";
 
                                 if (phase === 'completed') {
-                                    if (isCorrect) baseClass += "bg-green-100 border-green-400 text-green-700";
-                                    else if (isWrong) baseClass += "bg-red-50 border-red-200 text-red-500 opacity-60";
-                                    else if (isMissed) baseClass += "bg-yellow-50 border-yellow-300 text-yellow-600 border-dashed";
-                                    else baseClass += "bg-gray-50 border-gray-100 text-gray-300 opacity-40";
+                                    if (isCorrect) baseClass += isDarkMode ? "bg-green-500/20 border-green-500/40 text-green-400" : "bg-green-100 border-green-400 text-green-700";
+                                    else if (isWrong) baseClass += isDarkMode ? "bg-red-500/20 border-red-500/40 text-red-400 opacity-60" : "bg-red-50 border-red-200 text-red-500 opacity-60";
+                                    else if (isMissed) baseClass += isDarkMode ? "bg-yellow-500/20 border-yellow-500/40 text-yellow-500 border-dashed" : "bg-yellow-50 border-yellow-300 text-yellow-600 border-dashed";
+                                    else baseClass += isDarkMode ? "bg-white/5 border-white/5 text-gray-600 opacity-40" : "bg-gray-50 border-gray-100 text-gray-300 opacity-40";
                                 } else {
                                     if (isSelected) {
-                                        if (isCorrect) baseClass += "bg-purple-600 border-purple-600 text-white shadow-md transform scale-105"; // Reveal immediately? Or wait? 
-                                        // User asked for "dynamic feel", immediate feedback is usually more engaging for this type
-                                        else baseClass += "bg-gray-200 border-gray-300 text-gray-500"; // Don't reveal wrong immediately? Or do? Let's reveal.
+                                        if (isCorrect) baseClass += "bg-purple-600 border-purple-600 text-white shadow-md transform scale-105";
+                                        else baseClass += isDarkMode ? "bg-gray-800 border-gray-700 text-gray-500" : "bg-gray-200 border-gray-300 text-gray-500";
                                     } else {
-                                        baseClass += "bg-white border-gray-100 text-gray-600 hover:border-purple-200 hover:bg-purple-50 cursor-pointer hover:shadow-sm";
+                                        baseClass += isDarkMode
+                                            ? "bg-white/5 border-white/5 text-gray-400 hover:border-purple-500/30 hover:bg-purple-500/10 cursor-pointer"
+                                            : "bg-white border-gray-100 text-gray-600 hover:border-purple-200 hover:bg-purple-50 cursor-pointer hover:shadow-sm";
                                     }
                                 }
 
@@ -255,20 +263,20 @@ export const MemoryRecallTask = ({ onComplete, difficulty = "Medium" }: MemoryRe
 
                 {/* COMPLETED OVERLAY */}
                 {phase === 'completed' && (
-                    <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/90 backdrop-blur-sm animate-fade-in">
-                        <div className="text-center p-6 bg-white rounded-3xl shadow-2xl border border-gray-100 max-w-xs w-full">
+                    <div className={`absolute inset-0 z-20 flex items-center justify-center backdrop-blur-sm animate-fade-in ${isDarkMode ? 'bg-black/60' : 'bg-white/90'}`}>
+                        <div className={`text-center p-6 rounded-3xl shadow-2xl border max-w-xs w-full ${isDarkMode ? 'bg-[#1a1a1a] border-white/10' : 'bg-white border-gray-100'}`}>
                             <div className="mb-2 uppercase tracking-wider text-xs font-bold text-gray-400">Score</div>
-                            <div className={`text-6xl font-black mb-6 ${score === 100 ? 'text-green-500' : 'text-purple-600'}`}>
+                            <div className={`text-6xl font-black mb-6 ${score === 100 ? 'text-green-500' : (isDarkMode ? 'text-purple-400' : 'text-purple-600')}`}>
                                 {score}%
                             </div>
 
-                            <p className="text-gray-600 mb-8 font-medium">
+                            <p className={`mb-8 font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                                 {score === 100 ? "Perfect Memory! 🌟" : score > 60 ? "Great job! 🧠" : "Keep practicing!"}
                             </p>
 
                             <button
                                 onClick={startGame}
-                                className="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors"
+                                className={`w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors ${isDarkMode ? 'bg-white/10 hover:bg-white/20 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-800'}`}
                             >
                                 <RotateCcw size={18} /> Play Again
                             </button>

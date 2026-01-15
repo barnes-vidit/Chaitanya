@@ -61,15 +61,15 @@ const HorizontalProcessSection = ({ scrollContainerRef }: { scrollContainerRef?:
                     </div>
 
                     {cards.map((card, i) => (
-                        <div key={i} className={`w-[85vw] md:w-[600px] h-[60vh] shrink-0 rounded-[3rem] border backdrop-blur-sm p-12 flex flex-col justify-between ${card.bg} ${card.border}`}>
-                            <div>
-                                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-8 bg-black/40 ${card.color}`}>
-                                    <card.icon size={32} />
+                        <div key={i} className={`relative w-[85vw] md:w-[600px] h-[60vh] shrink-0 rounded-[3rem] border backdrop-blur-sm p-8 md:p-12 flex flex-col justify-between ${card.bg} ${card.border} overflow-hidden`}>
+                            <div className="relative z-10">
+                                <div className={`w-14 h-14 md:w-16 md:h-16 rounded-2xl flex items-center justify-center mb-6 md:mb-8 bg-black/40 ${card.color}`}>
+                                    <card.icon size={28} className="md:w-8 md:h-8" />
                                 </div>
-                                <h3 className="text-4xl font-bold mb-4">{card.title}</h3>
-                                <p className="text-xl text-gray-300 leading-relaxed">{card.desc}</p>
+                                <h3 className="text-2xl md:text-4xl font-bold mb-4">{card.title}</h3>
+                                <p className="text-lg md:text-xl text-gray-300 leading-relaxed">{card.desc}</p>
                             </div>
-                            <div className="text-9xl font-bold opacity-10 absolute bottom-4 right-8 select-none">
+                            <div className="text-6xl md:text-9xl font-bold opacity-10 absolute bottom-4 right-8 select-none z-0">
                                 0{i + 1}
                             </div>
                         </div>

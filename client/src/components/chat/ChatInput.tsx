@@ -6,9 +6,10 @@ import { Send, Mic, Paperclip, StopCircle, Loader2 } from 'lucide-react';
 
 interface ChatInputProps {
     onSendMessage: (message: string, type?: 'text' | 'file', fileMetadata?: any) => void;
+    isDarkMode?: boolean;
 }
 
-const ChatInput = ({ onSendMessage }: ChatInputProps) => {
+const ChatInput = ({ onSendMessage, isDarkMode = false }: ChatInputProps) => {
     const [isRecording, setIsRecording] = useState(false);
     const [message, setMessage] = useState('');
     const [isFocused, setIsFocused] = useState(false);
@@ -45,6 +46,11 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
             };
 
             recognitionRef.current.onend = () => setIsRecording(false);
+        }
+
+        // Auto-focus on mount
+        if (textareaRef.current) {
+            textareaRef.current.focus();
         }
     }, []);
 
@@ -89,8 +95,12 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
         <div className="w-full relative group">
             {/* Unified Pill Container */}
             <div className={`
-                relative flex items-end gap-2 p-2 rounded-[2rem] bg-white shadow-xl transition-all duration-300
-                border-2 ${isFocused ? 'border-primary/20 ring-4 ring-primary/5' : 'border-gray-50 hover:border-gray-100'}
+                relative flex items-end gap-2 p-2 rounded-[2rem] shadow-xl transition-all duration-300
+                ${isDarkMode ? 'bg-[#1a1a1a]/80 shadow-black/20 backdrop-blur-xl' : 'bg-white/80 backdrop-blur-xl'}
+                border-2 ${isFocused
+                    ? (isDarkMode ? 'border-blue-500/30 ring-4 ring-blue-500/10' : 'border-primary/20 ring-4 ring-primary/5')
+                    : (isDarkMode ? 'border-white/5 hover:border-white/10' : 'border-gray-50 hover:border-gray-100')
+                }
             `}>
 
                 {/* File Attachment */}
@@ -102,7 +112,13 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
                 />
                 <button
                     onClick={() => fileInputRef.current?.click()}
-                    className="p-3 mb-0.5 rounded-full text-gray-400 hover:text-primary hover:bg-primary/5 transition-all outline-none focus:bg-gray-100 shrink-0"
+                    className={`
+                        p-3 mb-0.5 rounded-full transition-all outline-none shrink-0
+                        ${isDarkMode
+                            ? 'text-gray-400 hover:text-white hover:bg-white/10 focus:bg-white/10'
+                            : 'text-gray-400 hover:text-primary hover:bg-primary/5 focus:bg-gray-100'
+                        }
+                    `}
                     title="Attach file"
                 >
                     <Paperclip className="w-5 h-5 -rotate-45" />
@@ -113,7 +129,11 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
                         ref={textareaRef}
                         rows={1}
                         placeholder={isRecording ? "Listening..." : "Type a message..."}
-                        className="w-full bg-transparent border-0 outline-none focus:ring-0 focus:border-0 focus:outline-none shadow-none ring-0 p-0 text-gray-700 placeholder:text-gray-400 resize-none max-h-40 leading-relaxed scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent pr-2"
+                        className={`
+                            w-full bg-transparent border-0 outline-none focus:ring-0 focus:border-0 focus:outline-none shadow-none ring-0 p-0 
+                            ${isDarkMode ? 'text-white placeholder:text-gray-500' : 'text-gray-700 placeholder:text-gray-400'}
+                            resize-none max-h-40 leading-relaxed scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent pr-2
+                        `}
                         value={message}
                         onChange={(e) => {
                             setMessage(e.target.value);
@@ -132,8 +152,11 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
                     className={`
                         p-3 mb-0.5 rounded-full transition-all shrink-0 outline-none
                         ${isRecording
-                            ? 'bg-red-50 text-red-500 animate-pulse'
-                            : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+                            ? 'bg-red-500/10 text-red-500 animate-pulse'
+                            : (isDarkMode
+                                ? 'text-gray-400 hover:text-white hover:bg-white/10'
+                                : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+                            )
                         }
                     `}
                     title="Voice input"
@@ -148,9 +171,13 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
                     className={`
                         p-3 mb-0.5 rounded-full transition-all duration-300 shrink-0 flex items-center justify-center
                         ${message.trim()
-                            ? 'bg-primary text-white shadow-lg shadow-primary/30 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0'
-                            : 'bg-gray-100 text-gray-300 cursor-not-allowed'
+                            ? (isDarkMode
+                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30 hover:bg-blue-500'
+                                : 'bg-primary text-white shadow-lg shadow-primary/30 hover:shadow-primary/40'
+                            )
+                            : (isDarkMode ? 'bg-white/5 text-gray-600 cursor-not-allowed' : 'bg-gray-100 text-gray-300 cursor-not-allowed')
                         }
+                        hover:-translate-y-0.5 active:translate-y-0
                     `}
                     title="Send message"
                 >

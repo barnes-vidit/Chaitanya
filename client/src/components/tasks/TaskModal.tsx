@@ -8,9 +8,10 @@ interface TaskModalProps {
     onClose: () => void;
     task: { type: string; difficulty: string } | null;
     onComplete: (result: any) => void;
+    isDarkMode?: boolean;
 }
 
-const TaskModal = ({ isOpen, onClose, task, onComplete }: TaskModalProps) => {
+const TaskModal = ({ isOpen, onClose, task, onComplete, isDarkMode = false }: TaskModalProps) => {
     const [showTutorial, setShowTutorial] = useState(false);
 
     // Reset/Check state when task opens
@@ -43,6 +44,7 @@ const TaskModal = ({ isOpen, onClose, task, onComplete }: TaskModalProps) => {
     if (!isOpen || !task) return null;
 
     const getFriendlyName = (type: string) => {
+        if (!type) return "Task";
         const map: Record<string, string> = {
             'CLOCK_DRAWING': 'Clock Challenge',
             'MEMORY_RECALL': 'Word Spark',
@@ -57,22 +59,22 @@ const TaskModal = ({ isOpen, onClose, task, onComplete }: TaskModalProps) => {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6">
             {/* Backdrop */}
             <div
-                className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity animate-fade-in"
+                className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity animate-fade-in"
                 onClick={onClose}
             />
 
             {/* Modal Content */}
-            <div className="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-fade-in-up">
+            <div className={`relative w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-fade-in-up ${isDarkMode ? 'bg-[#121212] ring-1 ring-white/10' : 'bg-white'}`}>
 
                 {/* Header - Always Visible */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+                <div className={`flex items-center justify-between px-6 py-4 border-b ${isDarkMode ? 'bg-[#1a1a1a] border-white/10' : 'bg-gray-50/50 border-gray-100'}`}>
                     <div className="flex items-center gap-3">
-                        <div className="p-2 bg-blue-50 text-blue-500 rounded-lg">
+                        <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-blue-500/10 text-blue-400' : 'bg-blue-50 text-blue-500'}`}>
                             <Activity className="w-5 h-5" />
                         </div>
                         <div>
-                            <h2 className="text-lg font-semibold text-gray-800">{friendlyName}</h2>
-                            <span className="text-xs font-medium text-gray-400">
+                            <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>{friendlyName}</h2>
+                            <span className={`text-xs font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-400'}`}>
                                 {showTutorial ? 'Tutorial' : `${task.difficulty} Mode`}
                             </span>
                         </div>
@@ -81,7 +83,7 @@ const TaskModal = ({ isOpen, onClose, task, onComplete }: TaskModalProps) => {
                         {!showTutorial && (
                             <button
                                 onClick={() => setShowTutorial(true)}
-                                className="p-2 rounded-full text-gray-400 hover:text-primary hover:bg-blue-50 transition-colors"
+                                className={`p-2 rounded-full transition-colors ${isDarkMode ? 'text-gray-400 hover:text-white hover:bg-white/10' : 'text-gray-400 hover:text-primary hover:bg-blue-50'}`}
                                 title="Show Tutorial"
                             >
                                 <HelpCircle className="w-5 h-5" />
@@ -89,7 +91,7 @@ const TaskModal = ({ isOpen, onClose, task, onComplete }: TaskModalProps) => {
                         )}
                         <button
                             onClick={onClose}
-                            className="p-2 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                            className={`p-2 rounded-full transition-colors ${isDarkMode ? 'text-gray-400 hover:text-white hover:bg-white/10' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'}`}
                         >
                             <X className="w-5 h-5" />
                         </button>
@@ -97,11 +99,12 @@ const TaskModal = ({ isOpen, onClose, task, onComplete }: TaskModalProps) => {
                 </div>
 
                 {/* Content Area */}
-                <div className="flex-1 overflow-hidden bg-gray-50 relative flex flex-col justify-center">
+                <div className={`flex-1 overflow-hidden relative flex flex-col justify-center ${isDarkMode ? 'bg-[#0a0a0a]' : 'bg-gray-50'}`}>
                     {showTutorial ? (
                         <TaskTutorial
                             type={task.type}
                             onComplete={handleTutorialComplete}
+                            isDarkMode={isDarkMode}
                         />
                     ) : (
                         <div className="w-full h-full flex items-center justify-center p-6 animate-fade-in">
@@ -112,6 +115,7 @@ const TaskModal = ({ isOpen, onClose, task, onComplete }: TaskModalProps) => {
                                     onComplete(result);
                                     onClose();
                                 }}
+                                isDarkMode={isDarkMode}
                             />
                         </div>
                     )}

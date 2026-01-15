@@ -4,6 +4,7 @@ import { ChevronRight, Check } from 'lucide-react';
 interface TutorialProps {
     type: string;
     onComplete: () => void;
+    isDarkMode?: boolean;
 }
 
 const TUTORIAL_CONTENT: Record<string, { title: string; steps: { text: string; subtext?: string }[] }> = {
@@ -23,10 +24,18 @@ const TUTORIAL_CONTENT: Record<string, { title: string; steps: { text: string; s
             { text: "Memorize", subtext: "You will see a list of words for a few seconds. Focus and try to remember them." },
             { text: "Recall", subtext: "Once they disappear, type as many as you can remember into the box." }
         ]
+    },
+    ATTENTION: { // Added missing fallback key just in case
+        title: "Reaction Tutorial",
+        steps: [
+            { text: "Reaction Challenge", subtext: "Test your focus and reaction speed." },
+            { text: "Wait for Color", subtext: "A colored box will appear. Watch for the TARGET color." },
+            { text: "Tap Quickly", subtext: "Tap the box immediately when it matches the target. Avoid other colors!" }
+        ]
     }
 };
 
-const TaskTutorial = ({ type, onComplete }: TutorialProps) => {
+const TaskTutorial = ({ type, onComplete, isDarkMode = false }: TutorialProps) => {
     const [currentStep, setCurrentStep] = useState(0);
     const content = TUTORIAL_CONTENT[type] || { title: "Activity", steps: [{ text: "Follow on-screen instructions." }] };
     const totalSteps = content.steps.length;
@@ -40,13 +49,15 @@ const TaskTutorial = ({ type, onComplete }: TutorialProps) => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center p-8 h-full min-h-[400px] animate-fade-in text-center">
+        <div className={`flex flex-col items-center justify-center p-8 h-full min-h-[400px] animate-fade-in text-center ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
             {/* Progress Dots */}
             <div className="flex gap-2 mb-8">
                 {content.steps.map((_, idx) => (
                     <div
                         key={idx}
-                        className={`h-2 rounded-full transition-all duration-300 ${idx === currentStep ? 'w-8 bg-primary' : 'w-2 bg-gray-200'
+                        className={`h-2 rounded-full transition-all duration-300 ${idx === currentStep
+                                ? (isDarkMode ? 'w-8 bg-blue-500' : 'w-8 bg-primary')
+                                : (isDarkMode ? 'w-2 bg-gray-700' : 'w-2 bg-gray-200')
                             }`}
                     />
                 ))}
@@ -54,10 +65,10 @@ const TaskTutorial = ({ type, onComplete }: TutorialProps) => {
 
             {/* Content */}
             <div className="flex-1 flex flex-col items-center justify-center max-w-md">
-                <h3 className="text-2xl font-bold text-gray-800 mb-4 animate-fade-in-up" key={`title-${currentStep}`}>
+                <h3 className={`text-2xl font-bold mb-4 animate-fade-in-up ${isDarkMode ? 'text-white' : 'text-gray-800'}`} key={`title-${currentStep}`}>
                     {content.steps[currentStep].text}
                 </h3>
-                <p className="text-gray-500 text-lg leading-relaxed mb-8 animate-fade-in-up" key={`desc-${currentStep}`}>
+                <p className={`text-lg leading-relaxed mb-8 animate-fade-in-up ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} key={`desc-${currentStep}`}>
                     {content.steps[currentStep].subtext}
                 </p>
             </div>
@@ -65,7 +76,11 @@ const TaskTutorial = ({ type, onComplete }: TutorialProps) => {
             {/* Navigation */}
             <button
                 onClick={handleNext}
-                className="w-full max-w-xs bg-primary text-white py-3.5 rounded-xl font-medium hover:bg-primary-dark transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2 group"
+                className={`w-full max-w-xs py-3.5 rounded-xl font-medium transition-all shadow-lg flex items-center justify-center gap-2 group
+                    ${isDarkMode
+                        ? 'bg-blue-600 text-white hover:bg-blue-500 shadow-blue-500/20'
+                        : 'bg-primary text-white hover:bg-primary-dark shadow-primary/20'}
+                `}
             >
                 {currentStep === totalSteps - 1 ? (
                     <>

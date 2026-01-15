@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { Check, RotateCcw, Clock } from 'lucide-react';
 
-export const ClockDrawingTask = ({ onComplete }: { onComplete?: (data: any) => void }) => {
+export const ClockDrawingTask = ({ onComplete, isDarkMode = false }: { onComplete?: (data: any) => void, isDarkMode?: boolean }) => {
     // Generate random time on mount
     const [targetTime] = useState(() => {
         const h = Math.floor(Math.random() * 12) + 1;
@@ -71,8 +71,7 @@ export const ClockDrawingTask = ({ onComplete }: { onComplete?: (data: any) => v
         const hDiff = getDiff(hourAngle, targetHourAngle);
         const mDiff = getDiff(minuteAngle, targetMinuteAngle);
 
-        // Tolerance: 15 degrees (~2.5 mins for minute hand, ~30 mins for hour hand logic is too loose, let's tighten)
-        // Hour hand tolerance: 15 deg is fine (half hour window almost)
+        // Tolerance: 20 degrees for hour, 10 degrees for minute
         const isCorrect = hDiff < 20 && mDiff < 10;
 
         if (onComplete) {
@@ -88,14 +87,19 @@ export const ClockDrawingTask = ({ onComplete }: { onComplete?: (data: any) => v
     };
 
     return (
-        <div className="relative overflow-hidden p-8 bg-gradient-to-br from-white to-blue-50/50 rounded-2xl border border-white/60 shadow-xl backdrop-blur-sm my-4 w-full max-w-sm mx-auto select-none group transition-all duration-300 hover:shadow-2xl">
+        <div className={`
+            relative overflow-hidden p-8 rounded-2xl border shadow-xl backdrop-blur-sm my-4 w-full max-w-sm mx-auto select-none group transition-all duration-300 hover:shadow-2xl
+            ${isDarkMode
+                ? 'bg-[#1a1a1a] border-white/10'
+                : 'bg-gradient-to-br from-white to-blue-50/50 border-white/60'}
+        `}>
             {/* Header / Gamified Prompt */}
             <div className="text-center mb-8 relative z-10">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-100/50 text-blue-700 rounded-full text-xs font-bold tracking-wider uppercase mb-3">
+                <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase mb-3 ${isDarkMode ? 'bg-blue-500/20 text-blue-300' : 'bg-blue-100/50 text-blue-700'}`}>
                     <Clock size={12} /> Challenge
                 </div>
-                <h3 className="font-display text-4xl font-bold text-gray-800 tracking-tight flex items-center justify-center gap-2">
-                    <span className="text-gray-400 font-light">Set to</span>
+                <h3 className="font-display text-4xl font-bold tracking-tight flex items-center justify-center gap-2">
+                    <span className={`${isDarkMode ? 'text-gray-500' : 'text-gray-400'} font-light`}>Set to</span>
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
                         {targetTime.hour}:{targetTime.minute.toString().padStart(2, '0')}
                     </span>
@@ -112,7 +116,7 @@ export const ClockDrawingTask = ({ onComplete }: { onComplete?: (data: any) => v
                 onTouchEnd={handleEnd}
             >
                 {/* Decorative Glow */}
-                <div className="absolute inset-0 bg-blue-400/20 blur-3xl rounded-full -z-10 animate-pulse" />
+                <div className={`absolute inset-0 blur-3xl rounded-full -z-10 animate-pulse ${isDarkMode ? 'bg-blue-500/10' : 'bg-blue-400/20'}`} />
 
                 <svg
                     ref={svgRef}
@@ -120,7 +124,7 @@ export const ClockDrawingTask = ({ onComplete }: { onComplete?: (data: any) => v
                     className="w-full h-full drop-shadow-2xl"
                 >
                     {/* Clock Face Background */}
-                    <circle cx="150" cy="150" r="140" fill="url(#faceGradient)" stroke="white" strokeWidth="2" className="shadow-inner" />
+                    <circle cx="150" cy="150" r="140" fill={isDarkMode ? '#222' : 'url(#faceGradient)'} stroke={isDarkMode ? '#333' : 'white'} strokeWidth="2" className="shadow-inner" />
                     <defs>
                         <linearGradient id="faceGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                             <stop offset="0%" stopColor="#ffffff" />
@@ -138,7 +142,7 @@ export const ClockDrawingTask = ({ onComplete }: { onComplete?: (data: any) => v
                             x1="150" y1="18"
                             x2="150" y2={i % 5 === 0 ? "28" : "22"}
                             transform={`rotate(${i * 6} 150 150)`}
-                            stroke={i % 5 === 0 ? "#cbd5e1" : "#e2e8f0"}
+                            stroke={i % 5 === 0 ? (isDarkMode ? '#555' : '#cbd5e1') : (isDarkMode ? '#333' : '#e2e8f0')}
                             strokeWidth={i % 5 === 0 ? "2" : "1"}
                         />
                     ))}
@@ -155,8 +159,8 @@ export const ClockDrawingTask = ({ onComplete }: { onComplete?: (data: any) => v
                                 y={150 + r * Math.sin(angle) + 1} // Optical adjust
                                 textAnchor="middle"
                                 dominantBaseline="middle"
-                                className="font-bold text-xl fill-slate-400 font-sans"
-                                style={{ filter: "url(#shadow)" }}
+                                className={`font-bold text-xl font-sans ${isDarkMode ? 'fill-gray-500' : 'fill-slate-400'}`}
+                                style={{ filter: isDarkMode ? 'none' : "url(#shadow)" }}
                             >
                                 {num}
                             </text>
@@ -166,7 +170,7 @@ export const ClockDrawingTask = ({ onComplete }: { onComplete?: (data: any) => v
                     {/* Minute Hand */}
                     <g
                         transform={`rotate(${minuteAngle}, 150, 150)`}
-                        filter="url(#shadow)"
+                        filter={isDarkMode ? 'none' : "url(#shadow)"}
                         className={`cursor-grab active:cursor-grabbing ${submitted ? 'pointer-events-none' : ''}`}
                         onMouseDown={handleStart('minute')}
                         onTouchStart={handleStart('minute')}
@@ -194,7 +198,7 @@ export const ClockDrawingTask = ({ onComplete }: { onComplete?: (data: any) => v
                     {/* Hour Hand */}
                     <g
                         transform={`rotate(${hourAngle}, 150, 150)`}
-                        filter="url(#shadow)"
+                        filter={isDarkMode ? 'none' : "url(#shadow)"}
                         className={`cursor-grab active:cursor-grabbing ${submitted ? 'pointer-events-none' : ''}`}
                         onMouseDown={handleStart('hour')}
                         onTouchStart={handleStart('hour')}
@@ -236,19 +240,10 @@ export const ClockDrawingTask = ({ onComplete }: { onComplete?: (data: any) => v
                     </button>
                 ) : (
                     <div className="flex gap-3 animate-fade-in">
-                        <span className="inline-flex items-center px-6 py-2 bg-green-100 text-green-700 rounded-lg font-medium border border-green-200">
+                        <span className={`inline-flex items-center px-6 py-2 rounded-lg font-medium border ${isDarkMode ? 'bg-green-500/10 text-green-400 border-green-500/20' : 'bg-green-100 text-green-700 border-green-200'}`}>
                             Excellent!
                         </span>
-                        {/* Removed reset button to prevent endless looping in a single task session if that was the intent, or keep it? User asked for dynamic task. If they reset, it should probably be a new task or just reset the current one. The original had local reset. I'll keep it but maybe it shouldn't regenerate time? Or should it? For "practice" it's good to regenerate. But for "I failed let me retry", maybe same time? 
-                           Actually, if they click retry, a new time is fun. 
-                           However, the prompt implies "one by one". 
-                           Let's keeping the "RotateCcw" button but make it reload the whole component to get a new time? 
-                           Or just setSubmitted(false) and keep same time? 
-                           I'll keep the logic simple: Resetting just resets the hands, not the time, so they can retry the *same* problem if they got it wrong? 
-                           Actually, the original logic had `setHourAngle(0)`.
-                           Let's keep it simple.
-                        */}
-                        <button onClick={() => { setSubmitted(false); setHourAngle(0); setMinuteAngle(0); }} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+                        <button onClick={() => { setSubmitted(false); setHourAngle(0); setMinuteAngle(0); }} className={`p-2 rounded-lg transition-colors ${isDarkMode ? 'text-gray-400 hover:text-white hover:bg-white/10' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'}`}>
                             <RotateCcw size={20} />
                         </button>
                     </div>

@@ -4,7 +4,6 @@ import MainLayout from './components/layout/MainLayout';
 import LandingPage from './pages/LandingPage';
 import ChatPage from './pages/ChatPage';
 import DashboardPage from './pages/DashboardPage';
-import AssessmentPage from './pages/AssessmentPage';
 import './App.css';
 
 function App() {
@@ -46,19 +45,7 @@ function App() {
               </>
             }
           />
-          <Route
-            path="/assessment"
-            element={
-              <>
-                <SignedIn>
-                  <AssessmentPage />
-                </SignedIn>
-                <SignedOut>
-                  <RedirectToSignIn />
-                </SignedOut>
-              </>
-            }
-          />
+
           {/* Fallback for undefined routes */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>

@@ -6,6 +6,7 @@ import TaskLauncher from '../components/tasks/TaskLauncher';
 import TaskModal from '../components/tasks/TaskModal';
 import { Menu, Maximize2, Minimize2 } from 'lucide-react';
 import { useAuth } from '@clerk/clerk-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Message {
     id: number | string;
@@ -38,9 +39,23 @@ const INITIAL_MESSAGES: Message[] = [getInitialMessage()];
 
 const ChatPage = () => {
     const { getToken } = useAuth();
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
-    const [activeChatId, setActiveChatId] = useState<string | null>(null);
+    const [activeChatId, setActiveChatId] = useState<string | null>(() => localStorage.getItem('lastActiveChatId'));
+    const [isDarkMode, setIsDarkMode] = useState(() => {
+        const savedMode = localStorage.getItem('isDarkMode');
+        return savedMode ? JSON.parse(savedMode) : false;
+    });
+    const [isThinking, setIsThinking] = useState(false);
+
+    useEffect(() => {
+        localStorage.setItem('isDarkMode', JSON.stringify(isDarkMode));
+    }, [isDarkMode]);
+
+    useEffect(() => {
+        if (activeChatId) localStorage.setItem('lastActiveChatId', activeChatId);
+    }, [activeChatId]);
+
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [activeTask, setActiveTask] = useState<{ type: string; difficulty: string; sourceMessageId?: number | string } | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -64,7 +79,7 @@ const ChatPage = () => {
         if (messages.length > 0) {
             setTimeout(() => scrollToBottom(), 100);
         }
-    }, [messages]);
+    }, [messages, isThinking]);
 
     const toggleFullscreen = () => {
         if (!document.fullscreenElement) {
@@ -83,7 +98,7 @@ const ChatPage = () => {
         setMessages([]);
         try {
             const token = await getToken();
-            const res = await fetch(`http://localhost:5000/api/chat/${id}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/chat/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             if (res.ok) {
@@ -118,13 +133,14 @@ const ChatPage = () => {
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         };
         setMessages((prev) => [...prev, newMessage]);
+        setIsThinking(true);
 
         try {
             const token = await getToken();
             let currentChatId = activeChatId;
 
             if (!currentChatId) {
-                const createRes = await fetch('http://localhost:5000/api/chat', {
+                const createRes = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/chat`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -142,7 +158,7 @@ const ChatPage = () => {
                 }
             }
 
-            const res = await fetch(`http://localhost:5000/api/chat/${currentChatId}/message`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/chat/${currentChatId}/message`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -171,6 +187,8 @@ const ChatPage = () => {
             }
         } catch (err) {
             console.error("Failed to send", err);
+        } finally {
+            setIsThinking(false);
         }
     };
 
@@ -195,7 +213,7 @@ const ChatPage = () => {
             const chatId = activeChatId;
             if (!chatId) return;
 
-            const res = await fetch(`http://localhost:5000/api/chat/${chatId}/task-result`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/chat/${chatId}/task-result`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -233,86 +251,186 @@ const ChatPage = () => {
     };
 
     return (
-        <div className="h-screen w-full bg-gray-50 flex overflow-hidden font-sans">
+        <div className={`h-screen w-full ${isDarkMode ? 'bg-[#0a0a0a]' : 'bg-gray-50 light-mode'} flex overflow-hidden font-sans transition-colors duration-300`}>
             <ChatSidebar
                 isOpen={isSidebarOpen}
                 onClose={() => setIsSidebarOpen(false)}
                 chatId={activeChatId}
                 onSelectChat={handleSelectChat}
                 onNewChat={handleNewChat}
+                isDarkMode={isDarkMode}
             />
 
             <div className="flex-1 flex flex-col w-full relative h-full">
                 {/* Header */}
-                <div className="flex items-center px-4 bg-white/80 backdrop-blur border-b border-gray-100 absolute top-0 left-0 right-0 z-30 justify-between md:static md:bg-transparent md:border-b-0 py-2 shrink-0">
+                <div className={`flex items-center px-4 ${isDarkMode ? 'bg-[#0a0a0a]/80 border-white/10' : 'bg-white/80 border-gray-100'} backdrop-blur border-b absolute top-0 left-0 right-0 z-30 justify-between md:static md:bg-transparent md:border-b-0 py-3 shrink-0`}>
                     <div className="flex items-center gap-3">
-                        <button onClick={() => setIsSidebarOpen(true)} className="md:hidden p-2 -ml-2 text-text-secondary hover:text-primary">
+                        <button onClick={() => setIsSidebarOpen(true)} className={`md:hidden p-2 -ml-2 ${isDarkMode ? 'text-gray-300 hover:text-white' : 'text-text-secondary hover:text-primary'}`}>
                             <Menu className="h-5 w-5" />
                         </button>
-                        <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="hidden md:flex p-2 text-text-secondary hover:text-primary transition-colors rounded-lg hover:bg-gray-100">
+                        <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className={`hidden md:flex p-2 ${isDarkMode ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-text-secondary hover:text-primary hover:bg-gray-100'} transition-colors rounded-lg`}>
                             <Menu className="h-5 w-5" />
                         </button>
-                        <span className="font-display font-semibold text-text-primary text-lg tracking-tight">Chaitanya AI</span>
+                        <span className={`font-display font-semibold ${isDarkMode ? 'text-white' : 'text-text-primary'} text-2xl md:text-3xl tracking-tight`}>Chaitanya AI</span>
                     </div>
                     <div className="flex items-center gap-2">
-                        <a href="/" className="hidden md:flex items-center gap-2 text-xs font-medium text-text-secondary hover:text-primary px-3 py-1.5 rounded-full hover:bg-gray-100 transition-all">
+                        {/* Theme Toggle */}
+                        <button
+                            onClick={() => setIsDarkMode(!isDarkMode)}
+                            className={`p-2 rounded-full transition-all ${isDarkMode ? 'text-yellow-400 hover:bg-white/10' : 'text-gray-400 hover:text-primary hover:bg-gray-100'}`}
+                        >
+                            <div className="relative w-5 h-5 flex items-center justify-center">
+                                <motion.div animate={{ rotate: isDarkMode ? 0 : 90, scale: isDarkMode ? 1 : 0 }} transition={{ duration: 0.2 }} className="absolute">
+                                    <Menu className="h-5 w-5 opacity-0" /> {/* Hacky placeholder to keep size */}
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" /></svg>
+                                </motion.div>
+                                <motion.div animate={{ rotate: isDarkMode ? -90 : 0, scale: isDarkMode ? 0 : 1 }} transition={{ duration: 0.2 }} className="absolute">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4" /><path d="M12 2v2" /><path d="M12 20v2" /><path d="m4.93 4.93 1.41 1.41" /><path d="m17.66 17.66 1.41 1.41" /><path d="M2 12h2" /><path d="M20 12h2" /><path d="m6.34 17.66-1.41 1.41" /><path d="m19.07 4.93-1.41 1.41" /></svg>
+                                </motion.div>
+                            </div>
+                        </button>
+
+                        <a href="/" className={`hidden md:flex items-center gap-2 text-xs font-medium ${isDarkMode ? 'text-gray-400 hover:text-white hover:bg-white/10' : 'text-text-secondary hover:text-primary hover:bg-gray-100'} px-3 py-1.5 rounded-full transition-all`}>
                             <span>Home</span>
                         </a>
-                        <button onClick={toggleFullscreen} className="p-2 text-text-secondary hover:text-primary hover:bg-gray-100 rounded-full transition-all">
+                        <button onClick={toggleFullscreen} className={`p-2 ${isDarkMode ? 'text-gray-400 hover:text-white hover:bg-white/10' : 'text-text-secondary hover:text-primary hover:bg-gray-100'} rounded-full transition-all`}>
                             {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
                         </button>
                     </div>
                 </div>
 
                 {/* Messages */}
-                <div className="flex-1 overflow-y-auto bg-gray-50 scroll-smooth w-full relative">
+                <div className={`flex-1 overflow-y-auto ${isDarkMode ? 'bg-[#0a0a0a]' : 'bg-gray-50'} scroll-smooth w-full relative`}>
                     <div className="min-h-full flex flex-col items-center p-4 md:p-6 lg:p-8 pt-20 md:pt-4">
-                        <div className="w-full max-w-3xl flex flex-col space-y-6 pb-2">
-                            {messages.length === 0 && (
-                                <div className="flex-1 flex flex-col items-center justify-center text-center p-8 mt-12 text-gray-400 animate-fade-in">
-                                    <h1 className="text-3xl font-display font-medium text-gray-700 mb-2">
-                                        {(() => {
-                                            const hour = new Date().getHours();
-                                            if (hour < 12) return "Good morning";
-                                            if (hour < 17) return "Good afternoon";
-                                            return "Good evening";
-                                        })()}
-                                    </h1>
-                                    <p className="text-lg font-light text-gray-500">
-                                        Ready to continue your journey?
-                                    </p>
+                        <div className="w-full max-w-3xl flex flex-col space-y-6 pb-2 relative min-h-[50vh]">
+                            {/* Centered Hero Greeting (Initial State) */}
+                            {messages.length <= 1 && (
+                                <div className="absolute inset-0 flex flex-col items-center justify-center -mt-20 pointer-events-none">
+                                    <motion.div
+                                        layoutId="greeting-container"
+                                        className={`flex flex-col items-center justify-center text-center p-8 max-w-2xl mx-auto`}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ duration: 0.6, ease: "easeOut" }}
+                                    >
+                                        <div className={`p-4 rounded-2xl mb-6 ${isDarkMode ? 'bg-white/5' : 'bg-white/50'} backdrop-blur-sm shadow-sm`}>
+                                            <span className="text-4xl">👋</span>
+                                        </div>
+                                        <motion.h1
+                                            className={`text-4xl md:text-5xl font-display font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4 leading-tight`}
+                                        >
+                                            {(() => {
+                                                const hour = new Date().getHours();
+                                                if (hour < 12) return "Good morning";
+                                                if (hour < 17) return "Good afternoon";
+                                                return "Good evening";
+                                            })()}
+                                        </motion.h1>
+                                        <motion.p
+                                            className={`text-xl ${isDarkMode ? 'text-gray-400' : 'text-gray-500'} font-light max-w-md mx-auto leading-relaxed`}
+                                        >
+                                            I am Chaitanya. How are you feeling today?
+                                        </motion.p>
+                                    </motion.div>
                                 </div>
                             )}
-                            {messages.map((msg) => (
-                                <div key={msg.id} className="flex flex-col w-full animate-fade-in-up">
-                                    <MessageBubble
-                                        message={msg.message}
-                                        sender={msg.sender}
-                                        timestamp={msg.timestamp}
-                                    />
-                                    {msg.suggestedTask && (
-                                        <div className="mt-4 mb-2 mx-auto w-full max-w-sm transform transition-all duration-500 ease-out">
-                                            <div className="animate-fade-in-up">
+
+                            {/* Standard Chat List (Visible when started) */}
+                            {messages.length > 1 && messages.map((msg, idx) => {
+                                return (
+                                    <motion.div
+                                        key={msg.id}
+                                        layout
+                                        initial={idx === 1 ? { opacity: 0, y: 20 } : { opacity: 0, scale: 0.95 }}
+                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                        className="flex flex-col w-full"
+                                    >
+                                        {/* If it's the very first message (the greeting), we render it as a bubble now */}
+                                        <MessageBubble
+                                            message={msg.message}
+                                            sender={msg.sender}
+                                            timestamp={msg.timestamp}
+                                            isDarkMode={isDarkMode}
+                                        />
+                                        {msg.suggestedTask && (
+                                            <div className="mt-4 mb-2 mx-auto w-full max-w-sm transform transition-all duration-500 ease-out">
                                                 <TaskLauncher
                                                     type={msg.suggestedTask.type}
                                                     difficulty={msg.suggestedTask.difficulty}
                                                     completed={msg.suggestedTask.completed}
                                                     onLaunch={() => setActiveTask({ ...msg.suggestedTask!, sourceMessageId: msg.id })}
+                                                    isDarkMode={isDarkMode}
                                                 />
                                             </div>
+                                        )}
+                                    </motion.div>
+                                );
+                            })}
+
+                            {/* AI Thinking Indicator */}
+                            <AnimatePresence mode="popLayout">
+                                {isThinking && (
+                                    <motion.div
+                                        layout
+                                        layoutId="ai-activity-bubble"
+                                        initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                                        exit={{ opacity: 0, scale: 0.9 }}
+                                        className="flex items-start mb-4"
+                                    >
+                                        <div className={`p-4 rounded-2xl rounded-tl-none backdrop-blur-md shadow-sm border
+                                            ${isDarkMode
+                                                ? 'bg-white/5 border-white/10 text-gray-200'
+                                                : 'bg-white/80 border-white/50 text-gray-700'
+                                            } flex items-center gap-3`}
+                                        >
+                                            {/* Animated Sparkle Icon */}
+                                            <div className="relative w-5 h-5 flex items-center justify-center">
+                                                <motion.div
+                                                    animate={{ rotate: 360, scale: [1, 1.2, 1] }}
+                                                    transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                                                    className={`absolute inset-0 opacity-50 blur-sm rounded-full ${isDarkMode ? 'bg-blue-500' : 'bg-blue-300'}`}
+                                                />
+                                                <svg className={`w-4 h-4 ${isDarkMode ? 'text-blue-400' : 'text-blue-500'}`} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" fill="currentColor" strokeLinecap="round" strokeLinejoin="round" />
+                                                </svg>
+                                            </div>
+
+                                            {/* Animated Text */}
+                                            <div className="flex gap-1 items-center h-4">
+                                                <span className="text-sm font-medium opacity-90">Thinking</span>
+                                                <div className="flex gap-0.5 pt-1.5 pl-0.5">
+                                                    <motion.div
+                                                        animate={{ y: [0, -3, 0] }}
+                                                        transition={{ duration: 0.6, repeat: Infinity, delay: 0 }}
+                                                        className={`w-1 h-1 rounded-full ${isDarkMode ? 'bg-blue-400' : 'bg-blue-500'}`}
+                                                    />
+                                                    <motion.div
+                                                        animate={{ y: [0, -3, 0] }}
+                                                        transition={{ duration: 0.6, repeat: Infinity, delay: 0.2 }}
+                                                        className={`w-1 h-1 rounded-full ${isDarkMode ? 'bg-blue-400' : 'bg-blue-500'}`}
+                                                    />
+                                                    <motion.div
+                                                        animate={{ y: [0, -3, 0] }}
+                                                        transition={{ duration: 0.6, repeat: Infinity, delay: 0.4 }}
+                                                        className={`w-1 h-1 rounded-full ${isDarkMode ? 'bg-blue-400' : 'bg-blue-500'}`}
+                                                    />
+                                                </div>
+                                            </div>
                                         </div>
-                                    )}
-                                </div>
-                            ))}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+
                             <div ref={messagesEndRef} />
                         </div>
                     </div>
                 </div>
 
                 {/* Input */}
-                <div className="w-full flex justify-center bg-transparent pointer-events-none z-20 pb-0 pt-2">
+                <div className="w-full flex justify-center bg-transparent pointer-events-none z-20 pb-4 md:pb-6 pt-2">
                     <div className="w-full max-w-3xl px-4 pointer-events-auto">
-                        <ChatInput onSendMessage={handleSendMessage} />
+                        <ChatInput onSendMessage={handleSendMessage} isDarkMode={isDarkMode} />
                     </div>
                 </div>
             </div>
@@ -323,6 +441,7 @@ const ChatPage = () => {
                 onClose={() => setActiveTask(null)}
                 task={activeTask}
                 onComplete={(result) => handleTaskComplete(activeTask!.type, result)}
+                isDarkMode={isDarkMode}
             />
         </div>
     );

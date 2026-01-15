@@ -1,0 +1,302 @@
+[
+    {
+        "id": "rem_001",
+        "category": "REMINISCENCE",
+        "text": "I was wondering, what was the very first house you lived in like? Do you remember the color of the walls?",
+        "tags": [
+            "childhood",
+            "visual",
+            "home"
+        ]
+    },
+    {
+        "id": "rem_002",
+        "category": "REMINISCENCE",
+        "text": "Who was the one teacher in school that you were actually scared of?",
+        "tags": [
+            "school",
+            "people",
+            "childhood"
+        ]
+    },
+    {
+        "id": "rem_003",
+        "category": "REMINISCENCE",
+        "text": "Did you have a favorite hiding spot when you played hide-and-seek as a child?",
+        "tags": [
+            "play",
+            "childhood",
+            "memory"
+        ]
+    },
+    {
+        "id": "rem_004",
+        "category": "REMINISCENCE",
+        "text": "What was the best thing about summer holidays when you were a kid? Was it the mangoes or the freedom?",
+        "tags": [
+            "childhood",
+            "positive",
+            "seasons"
+        ]
+    },
+    {
+        "id": "rem_005",
+        "category": "REMINISCENCE",
+        "text": "Do you remember the first time you ever saw a movie in a theater? What did you watch?",
+        "tags": [
+            "entertainment",
+            "first_experiences",
+            "visual"
+        ]
+    },
+    {
+        "id": "rem_006",
+        "category": "REMINISCENCE",
+        "text": "What did you buy with your very first salary paycheck? Do you remember?",
+        "tags": [
+            "career",
+            "milestone",
+            "pride"
+        ]
+    },
+    {
+        "id": "rem_007",
+        "category": "REMINISCENCE",
+        "text": "Tell me about your first job interview. Were you nervous?",
+        "tags": [
+            "career",
+            "emotion",
+            "anxiety"
+        ]
+    },
+    {
+        "id": "rem_008",
+        "category": "REMINISCENCE",
+        "text": "How did people celebrate weddings differently when you were in your 20s compared to now?",
+        "tags": [
+            "culture",
+            "comparison",
+            "society"
+        ]
+    },
+    {
+        "id": "rem_009",
+        "category": "REMINISCENCE",
+        "text": "What was the most difficult journey you ever took by train or bus?",
+        "tags": [
+            "travel",
+            "resilience",
+            "storytelling"
+        ]
+    },
+    {
+        "id": "rem_010",
+        "category": "REMINISCENCE",
+        "text": "If you could go back to being 25 years old for one day, what would you do differently?",
+        "tags": [
+            "reflection",
+            "self",
+            "wisdom"
+        ]
+    },
+    {
+        "id": "exp_001",
+        "category": "EXPERT",
+        "text": "I'm trying to understand how to handle disagreements. How did you handle arguments in your family to keep the peace?",
+        "tags": [
+            "conflict_resolution",
+            "family",
+            "advice"
+        ]
+    },
+    {
+        "id": "exp_002",
+        "category": "EXPERT",
+        "text": "People say cooking is an art. What is the one secret ingredient that makes a dish taste like 'home'?",
+        "tags": [
+            "cooking",
+            "sensory",
+            "opinion"
+        ]
+    },
+    {
+        "id": "exp_003",
+        "category": "EXPERT",
+        "text": "What is the best piece of advice you ever received from your parents?",
+        "tags": [
+            "parents",
+            "wisdom",
+            "values"
+        ]
+    },
+    {
+        "id": "exp_004",
+        "category": "EXPERT",
+        "text": "Raising children seems so hard these days. What do you think is the most important thing to teach a child?",
+        "tags": [
+            "parenting",
+            "advice",
+            "society"
+        ]
+    },
+    {
+        "id": "exp_005",
+        "category": "EXPERT",
+        "text": "If you could tell the younger generation one thing about patience, what would it be?",
+        "tags": [
+            "values",
+            "advice",
+            "reflection"
+        ]
+    },
+    {
+        "id": "sen_001",
+        "category": "SENSORY",
+        "text": "If you look out your window right now, what is the most interesting thing you can see?",
+        "tags": [
+            "visual",
+            "present_moment",
+            "observation"
+        ]
+    },
+    {
+        "id": "sen_002",
+        "category": "SENSORY",
+        "text": "I was thinking about the smell of rain on dry earth. What is your favorite smell in the world?",
+        "tags": [
+            "olfactory",
+            "nature",
+            "positive"
+        ]
+    },
+    {
+        "id": "sen_003",
+        "category": "SENSORY",
+        "text": "Do you prefer the quiet of the early morning or the calmness of the late night? Why?",
+        "tags": [
+            "preference",
+            "environment",
+            "routine"
+        ]
+    },
+    {
+        "id": "sen_004",
+        "category": "SENSORY",
+        "text": "Describe the most beautiful outfit you ever wore. What color was it?",
+        "tags": [
+            "visual",
+            "fashion",
+            "memory"
+        ]
+    },
+    {
+        "id": "sen_005",
+        "category": "SENSORY",
+        "text": "If we were sitting in a garden right now, which flowers would you want us to be surrounded by?",
+        "tags": [
+            "visual",
+            "nature",
+            "imagination"
+        ]
+    },
+    {
+        "id": "fam_001",
+        "category": "FAMILY",
+        "text": "Who is the 'troublemaker' or the prankster in your family currently?",
+        "tags": [
+            "relationships",
+            "humor",
+            "people"
+        ]
+    },
+    {
+        "id": "fam_002",
+        "category": "FAMILY",
+        "text": "Is there a specific song or lullaby you used to sing to your children?",
+        "tags": [
+            "music",
+            "children",
+            "memory"
+        ]
+    },
+    {
+        "id": "fam_003",
+        "category": "FAMILY",
+        "text": "Who in your family has the loudest laugh? Can you describe it?",
+        "tags": [
+            "auditory",
+            "joy",
+            "people"
+        ]
+    },
+    {
+        "id": "fam_004",
+        "category": "FAMILY",
+        "text": "Festivals can be so busy. Which festival did you actually enjoy the most for the food?",
+        "tags": [
+            "culture",
+            "food",
+            "celebration"
+        ]
+    },
+    {
+        "id": "fam_005",
+        "category": "FAMILY",
+        "text": "Do you think names influence a person's character? Why did you choose the names you did for your children?",
+        "tags": [
+            "names",
+            "belief",
+            "parenting"
+        ]
+    },
+    {
+        "id": "hyp_001",
+        "category": "HYPOTHETICAL",
+        "text": "If you could invite any famous person from history to have chai with us right now, who would you pick?",
+        "tags": [
+            "imagination",
+            "history",
+            "social"
+        ]
+    },
+    {
+        "id": "hyp_002",
+        "category": "HYPOTHETICAL",
+        "text": "If you won a lottery today, but you had to give it all away, who would you give it to?",
+        "tags": [
+            "altruism",
+            "imagination",
+            "values"
+        ]
+    },
+    {
+        "id": "hyp_003",
+        "category": "HYPOTHETICAL",
+        "text": "If you could instantly learn to play any musical instrument perfectly, which one would it be?",
+        "tags": [
+            "music",
+            "skill",
+            "imagination"
+        ]
+    },
+    {
+        "id": "hyp_004",
+        "category": "HYPOTHETICAL",
+        "text": "Do you think technology has brought people closer together or pushed them further apart?",
+        "tags": [
+            "opinion",
+            "society",
+            "reasoning"
+        ]
+    },
+    {
+        "id": "hyp_005",
+        "category": "HYPOTHETICAL",
+        "text": "If you could plan a perfect Sunday, start to finish, what would it look like?",
+        "tags": [
+            "planning",
+            "preference",
+            "routine"
+        ]
+    }
+]

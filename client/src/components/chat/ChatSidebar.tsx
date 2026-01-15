@@ -17,9 +17,10 @@ interface ChatSidebarProps {
     chatId: string | null;
     onSelectChat: (id: string) => void;
     onNewChat: () => void;
+    isDarkMode: boolean;
 }
 
-const ChatSidebar = ({ isOpen, onClose, chatId, onSelectChat, onNewChat }: ChatSidebarProps) => {
+const ChatSidebar = ({ isOpen, onClose, chatId, onSelectChat, onNewChat, isDarkMode }: ChatSidebarProps) => {
     const { getToken } = useAuth();
     const [history, setHistory] = useState<ChatHistoryItem[]>([]);
     const [loading, setLoading] = useState(true);
@@ -31,7 +32,7 @@ const ChatSidebar = ({ isOpen, onClose, chatId, onSelectChat, onNewChat }: ChatS
         const fetchHistory = async () => {
             try {
                 const token = await getToken();
-                const res = await fetch('http://localhost:5000/api/chat', {
+                const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/chat`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 if (res.ok) {
@@ -59,7 +60,7 @@ const ChatSidebar = ({ isOpen, onClose, chatId, onSelectChat, onNewChat }: ChatS
         if (!newTitle.trim()) return;
         try {
             const token = await getToken();
-            const res = await fetch(`http://localhost:5000/api/chat/${id}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/chat/${id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -84,7 +85,7 @@ const ChatSidebar = ({ isOpen, onClose, chatId, onSelectChat, onNewChat }: ChatS
         if (!confirm('Delete this chat?')) return;
         try {
             const token = await getToken();
-            await fetch(`http://localhost:5000/api/chat/${id}`, {
+            await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/chat/${id}`, {
                 method: 'DELETE',
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -95,20 +96,44 @@ const ChatSidebar = ({ isOpen, onClose, chatId, onSelectChat, onNewChat }: ChatS
     };
 
 
-    // Group by date (simplified)
+    // Group by date (Smart Grouping)
     const groupedHistory = filteredHistory.reduce((acc, chat) => {
-        const date = new Date(chat.lastMessageAt).toLocaleDateString();
-        if (!acc[date]) acc[date] = [];
-        acc[date].push(chat);
+        const chatDate = new Date(chat.lastMessageAt);
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const lastWeek = new Date(today);
+        lastWeek.setDate(lastWeek.getDate() - 7);
+
+        const checkDate = new Date(chatDate.getFullYear(), chatDate.getMonth(), chatDate.getDate());
+
+        let category = 'Older';
+        if (checkDate.getTime() === today.getTime()) {
+            category = 'Today';
+        } else if (checkDate.getTime() === yesterday.getTime()) {
+            category = 'Yesterday';
+        } else if (checkDate > lastWeek) {
+            category = 'Previous 7 Days';
+        }
+
+        if (!acc[category]) acc[category] = [];
+        acc[category].push(chat);
         return acc;
     }, {} as Record<string, ChatHistoryItem[]>);
+
+    // Sort categories order
+    const categoryOrder = ['Today', 'Yesterday', 'Previous 7 Days', 'Older'];
+    const sortedCategories = Object.entries(groupedHistory).sort((a, b) => {
+        return categoryOrder.indexOf(a[0]) - categoryOrder.indexOf(b[0]);
+    });
 
     return (
         <>
             {/* Mobile Overlay */}
             {isOpen && (
                 <div
-                    className="fixed inset-0 bg-black/20 z-40 md:hidden backdrop-blur-sm"
+                    className="fixed inset-0 bg-black/50 z-40 md:hidden backdrop-blur-sm"
                     onClick={onClose}
                 />
             )}
@@ -131,14 +156,14 @@ const ChatSidebar = ({ isOpen, onClose, chatId, onSelectChat, onNewChat }: ChatS
                 animate={isOpen ? "open" : "closed"}
                 className={`
                     fixed md:relative z-50 h-full 
-                    bg-white border-r border-gray-100 flex flex-col
+                    ${isDarkMode ? 'bg-[#121212] border-white/10' : 'bg-white border-gray-100'} 
+                    border-r flex flex-col
                     overflow-hidden
-                    ${isOpen ? 'border-r' : 'border-none'}
                 `}
             >
                 {/* Header with Home & New Chat */}
                 <div className="p-4 space-y-3">
-                    <a href="/" className="flex items-center gap-2 text-text-secondary hover:text-primary transition-colors mb-2 px-2">
+                    <a href="/" className={`flex items-center gap-2 ${isDarkMode ? 'text-gray-400 hover:text-white' : 'text-text-secondary hover:text-primary'} transition-colors mb-2 px-2`}>
                         <ArrowLeft className="h-4 w-4" />
                         <span className="font-medium text-sm">Back to Home</span>
                     </a>
@@ -148,7 +173,7 @@ const ChatSidebar = ({ isOpen, onClose, chatId, onSelectChat, onNewChat }: ChatS
                             onNewChat();
                             if (window.innerWidth < 768) onClose();
                         }}
-                        className="accessible-button w-full shadow-soft bg-white text-primary border border-gray-100 hover:bg-gray-50 flex items-center justify-start gap-3 px-4"
+                        className={`accessible-button w-full shadow-soft ${isDarkMode ? 'bg-white/10 text-white border-white/10 hover:bg-white/20' : 'bg-white text-primary border border-gray-100 hover:bg-gray-50'} flex items-center justify-start gap-3 px-4`}
                     >
                         <Plus className="h-6 w-6" />
                         <span>New Convo</span>
@@ -162,7 +187,7 @@ const ChatSidebar = ({ isOpen, onClose, chatId, onSelectChat, onNewChat }: ChatS
                             placeholder="Search chats..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-100 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary/50 text-text-primary placeholder:text-text-secondary"
+                            className={`w-full pl-9 pr-4 py-2 ${isDarkMode ? 'bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:ring-blue-500/50' : 'bg-gray-50 border-gray-100 text-text-primary placeholder:text-text-secondary focus:ring-primary/50'} border rounded-lg text-sm focus:outline-none focus:ring-1`}
                         />
                     </div>
                 </div>
@@ -174,9 +199,9 @@ const ChatSidebar = ({ isOpen, onClose, chatId, onSelectChat, onNewChat }: ChatS
                             <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
                         </div>
                     ) : (
-                        Object.entries(groupedHistory).map(([date, items]) => (
+                        sortedCategories.map(([date, items]) => (
                             <div key={date} className="mb-6">
-                                <h3 className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-3 px-2 flex items-center gap-2">
+                                <h3 className={`text-xs font-semibold ${isDarkMode ? 'text-gray-500' : 'text-text-secondary'} uppercase tracking-wider mb-3 px-2 flex items-center gap-2`}>
                                     <Calendar className="h-3 w-3" />
                                     {date}
                                 </h3>
@@ -189,7 +214,7 @@ const ChatSidebar = ({ isOpen, onClose, chatId, onSelectChat, onNewChat }: ChatS
                                                         type="text"
                                                         value={editTitle}
                                                         onChange={(e) => setEditTitle(e.target.value)}
-                                                        className="flex-1 bg-white border border-primary/30 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                                                        className={`flex-1 ${isDarkMode ? 'bg-white/10 text-white border-white/20' : 'bg-white border-primary/30'} border rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-primary`}
                                                         autoFocus
                                                         onKeyDown={(e) => {
                                                             if (e.key === 'Enter') handleRename(item._id, editTitle);
@@ -216,10 +241,13 @@ const ChatSidebar = ({ isOpen, onClose, chatId, onSelectChat, onNewChat }: ChatS
                                                         if (window.innerWidth < 768) onClose();
                                                     }}
                                                     className={`w-full text-left px-3 py-3 rounded-xl transition-colors flex items-center gap-3 pr-16 relative
-                                                        ${chatId === item._id ? 'bg-blue-50 text-blue-700 font-medium' : 'text-text-primary hover:bg-gray-50'}
+                                                        ${chatId === item._id
+                                                            ? (isDarkMode ? 'bg-blue-600/20 text-blue-200' : 'bg-blue-50 text-blue-700 font-medium')
+                                                            : (isDarkMode ? 'text-gray-300 hover:bg-white/5' : 'text-text-primary hover:bg-gray-50')
+                                                        }
                                                     `}
                                                 >
-                                                    <MessageSquare className={`h-4 w-4 shrink-0 transition-colors ${chatId === item._id ? 'text-blue-500' : 'text-gray-400 group-hover:text-primary'}`} />
+                                                    <MessageSquare className={`h-4 w-4 shrink-0 transition-colors ${chatId === item._id ? 'text-blue-500' : (isDarkMode ? 'text-gray-600 group-hover:text-gray-400' : 'text-gray-400 group-hover:text-primary')}`} />
                                                     <span className="truncate text-sm font-medium">
                                                         {item.title || `Chat ${new Date(item.lastMessageAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
                                                     </span>
@@ -228,7 +256,7 @@ const ChatSidebar = ({ isOpen, onClose, chatId, onSelectChat, onNewChat }: ChatS
 
                                             {/* Action Buttons - Visible on Hover */}
                                             {editingId !== item._id && (
-                                                <div className="absolute right-2 flex items-center opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-l from-white via-white to-transparent pl-4 z-10">
+                                                <div className={`absolute right-2 flex items-center opacity-0 group-hover:opacity-100 transition-opacity ${isDarkMode ? 'bg-gradient-to-l from-[#121212] via-[#121212] to-transparent' : 'bg-gradient-to-l from-white via-white to-transparent'} pl-4 z-10`}>
                                                     <button
                                                         onClick={(e) => {
                                                             e.stopPropagation();
@@ -261,8 +289,8 @@ const ChatSidebar = ({ isOpen, onClose, chatId, onSelectChat, onNewChat }: ChatS
                 </div>
 
                 {/* Bottom Profile/Settings Placeholder */}
-                <div className="p-4 border-t border-gray-100 bg-gray-50/50">
-                    <p className="text-xs text-text-secondary text-center">
+                <div className={`p-4 border-t ${isDarkMode ? 'border-white/10 bg-white/5' : 'border-gray-100 bg-gray-50/50'}`}>
+                    <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-text-secondary'} text-center`}>
                         All conversations are private.
                     </p>
                 </div>

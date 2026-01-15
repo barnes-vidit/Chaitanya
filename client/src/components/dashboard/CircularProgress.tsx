@@ -7,6 +7,7 @@ interface CircularProgressProps {
     label: string;
     subLabel?: string;
     color?: string;
+    trackColor?: string;
 }
 
 const CircularProgress = ({
@@ -15,7 +16,8 @@ const CircularProgress = ({
     strokeWidth = 15,
     label,
     subLabel,
-    color = "#2DD4BF" // Teal-400 default
+    color = "#2DD4BF", // Teal-400 default
+    trackColor = "#E5E7EB"
 }: CircularProgressProps) => {
     const radius = (size - strokeWidth) / 2;
     const circumference = radius * 2 * Math.PI;
@@ -29,7 +31,7 @@ const CircularProgress = ({
                     cx={size / 2}
                     cy={size / 2}
                     r={radius}
-                    stroke="#E5E7EB"
+                    stroke={trackColor}
                     strokeWidth={strokeWidth}
                     fill="transparent"
                 />
@@ -53,7 +55,7 @@ const CircularProgress = ({
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5 }}
-                    className="text-4xl font-bold text-gray-800"
+                    className="text-4xl font-bold text-white"
                 >
                     {value}%
                 </motion.span>

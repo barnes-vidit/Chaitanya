@@ -5,18 +5,7 @@ const MessageSchema = new mongoose.Schema({
     senderRole: { type: String, enum: ['user', 'ai'], required: true },
     content: { type: String, required: true },
     type: { type: String, enum: ['text', 'image', 'audio', 'file'], default: 'text' },
-    metadata: {
-        fileUrl: String,
-        duration: Number, // for audio
-        sentiment: String,
-        suggestedTask: {
-            type: { type: String },
-            difficulty: String,
-            completed: Boolean
-        },
-        isTaskSuggestion: Boolean,
-        hidden: Boolean
-    },
+    metadata: { type: mongoose.Schema.Types.Mixed },
     timestamp: { type: Date, default: Date.now }
 });
 

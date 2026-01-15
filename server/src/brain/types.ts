@@ -17,9 +17,13 @@ export interface ConversationState {
     engagementScore: number;
     tasksDoneToday: number;
     lastTaskType: string | null;
-    lastTaskTimestamp: Date | null;
     turnsSinceLastTask: number;
     taskResults: TaskResult[];
+    history: {
+        role: 'user' | 'assistant' | 'system';
+        content: string;
+        timestamp?: Date;
+    }[];
 }
 
 export interface PolicyOutput {
@@ -35,6 +39,9 @@ export interface LLMInput {
     state: ConversationState;
     policy: PolicyOutput;
     tone: string;
+    ragContext?: string[];
+    userProfile?: any; // Keeping as any for flexibility, or we could import UserProfile interface
+    strategicDirective?: string;
 }
 
 export interface LLMJsonOutput {
@@ -52,6 +59,6 @@ export interface BrainResponse {
         suggestedTask?: {
             type: string;
             difficulty: string;
-        };
+        } | undefined;
     };
 }

@@ -12,9 +12,10 @@ interface MessageBubbleProps {
     sender: 'user' | 'ai';
     timestamp: string;
     attachments?: Attachment[];
+    isDarkMode?: boolean;
 }
 
-const MessageBubble = ({ message, sender, timestamp, attachments }: MessageBubbleProps) => {
+const MessageBubble = ({ message, sender, timestamp, attachments, isDarkMode = false }: MessageBubbleProps) => {
     const isAi = sender === 'ai';
 
     return (
@@ -27,7 +28,9 @@ const MessageBubble = ({ message, sender, timestamp, attachments }: MessageBubbl
                 {/* Avatar */}
                 <div className={`
                     w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm transition-transform hover:scale-105 cursor-default mt-1
-                    ${isAi ? 'bg-white text-primary ring-1 ring-gray-100' : 'bg-primary text-white'}
+                    ${isAi
+                        ? (isDarkMode ? 'bg-white/10 text-white ring-1 ring-white/10' : 'bg-white text-primary ring-1 ring-gray-100')
+                        : 'bg-primary text-white'}
                 `}>
                     {isAi ? <Sparkles className="w-4 h-4" /> : <User className="w-4 h-4" />}
                 </div>
@@ -37,8 +40,8 @@ const MessageBubble = ({ message, sender, timestamp, attachments }: MessageBubbl
                     <div className={`
                         rounded-2xl text-base leading-relaxed font-sans text-left break-words
                         ${isAi
-                            ? 'bg-transparent text-text-primary px-0 py-1' // AI: No bg, minimal padding
-                            : 'bg-primary text-white py-2 px-3 rounded-br-sm shadow-md shadow-primary/20' // User: tighter padding
+                            ? (isDarkMode ? 'bg-transparent text-gray-100 px-0 py-1' : 'bg-transparent text-text-primary px-0 py-1')
+                            : 'bg-primary text-white py-2 px-3 rounded-br-sm shadow-md shadow-primary/20'
                         }
                     `}>
                         {message}
@@ -49,7 +52,7 @@ const MessageBubble = ({ message, sender, timestamp, attachments }: MessageBubbl
                                 {attachments.map((file, idx) => (
                                     <div key={idx} className={`
                                         flex items-center gap-3 p-3 rounded-xl 
-                                        ${isAi ? 'bg-gray-50' : 'bg-white/20'}
+                                        ${isAi ? (isDarkMode ? 'bg-white/5' : 'bg-gray-50') : 'bg-white/20'}
                                     `}>
                                         {file.type === 'image' ? <ImageIcon className="w-5 h-5" /> : <FileText className="w-5 h-5" />}
                                         <span className="text-sm truncate opacity-90">{file.name}</span>

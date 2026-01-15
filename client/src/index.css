@@ -37,6 +37,22 @@
 }
 
 /* Global Scroll Fix */
+:root {
+  /* Default Dark Scrollbar (matches global dark theme) */
+  --scrollbar-bg: #050505;
+  --scrollbar-track: #0a0a0a;
+  --scrollbar-thumb: #334155;
+  --scrollbar-thumb-hover: #475569;
+}
+
+.light-mode {
+  /* Light Scrollbar Theme */
+  --scrollbar-bg: #f9fafb;
+  --scrollbar-track: #f3f4f6;
+  --scrollbar-thumb: #cbd5e1;
+  --scrollbar-thumb-hover: #94a3b8;
+}
+
 html,
 body,
 #root {
@@ -45,9 +61,27 @@ body,
   margin: 0;
   padding: 0;
   overflow-y: auto;
-  /* Allow scrolling */
-  background-color: #f9fafb;
-  /* gray-50 */
+  background-color: var(--scrollbar-bg);
+  /* Deep black default to prevent white gaps */
+  color: #ffffff;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
 }
 
 /* Custom Animations */
@@ -95,4 +129,37 @@ body,
 
 .animation-delay-4000 {
   animation-delay: 4s;
+}
+
+/* Glassmorphism Utilities */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.glass-card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+/* Mesh Gradients */
+.bg-mesh-gradient {
+  background-color: #f3f4f6;
+  background-image:
+    radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%),
+    radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%),
+    radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
+}
+
+.text-gradient-primary {
+  background: linear-gradient(to right, #4f46e5, #06b6d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
