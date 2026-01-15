@@ -1,8 +1,8 @@
-# Chaitanya - AI Companion for the Elderly 🌸
+# Chaitanya - AI Companion for Early Detection of Dementia
 
-**Chaitanya** is an advanced, empathetic AI designed to provide companionship and cognitive stimulation for the elderly. Built with a "grandchild-like" persona, it helps users reminisce, stay engaged, and perform subtle cognitive exercises disguised as fun activities.
+**Chaitanya** is an advanced, empathetic AI designed to provide companionship and cognitive stimulation for the elderly. Built with a caring and patient persona, it helps users reminisce, stay engaged, and perform subtle cognitive exercises disguised as fun activities.
 
-![Chaitanya Interface](https://via.placeholder.com/800x450?text=Chaitanya+UI+Preview) -> *Replace with actual screenshot*
+Live Link : https://chaitanya-kv.vercel.app/
 
 ## 🌟 Key Features
 
@@ -81,6 +81,10 @@ Chaitanya seamlessly weaves standardized neurological assessments into natural c
     ```bash
     npm run dev
     ```
+
+## Developers
+Kritika Rathore
+Vidit Sharma
 
 ## 🤝 Contributing
 Contributions are welcome! Please feel free to submit a Pull Request.
