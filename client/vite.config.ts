@@ -8,7 +8,9 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['react', 'react-dom', 'framer-motion', 'lucide-react'],
+          vendor: ['react', 'react-dom', 'framer-motion', 'lucide-react', 'react-router-dom'],
+          charts: ['recharts'],
+          auth: ['@clerk/clerk-react'],
         },
       },
     },

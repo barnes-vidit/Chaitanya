@@ -37,9 +37,7 @@ const IntroOverlay: React.FC<IntroOverlayProps> = ({ onComplete }) => {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.8 }}
             >
-                <style>{`
-                    @import url('https://fonts.googleapis.com/css2?family=Rozha+One&display=swap');
-                `}</style>
+                {/* Font is now preloaded in index.html with non-blocking strategy */}
 
                 <div className="absolute inset-0 pointer-events-none">
                     <div className="absolute inset-0 opacity-20"

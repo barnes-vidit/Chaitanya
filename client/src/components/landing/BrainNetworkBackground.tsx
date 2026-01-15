@@ -1,9 +1,18 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const BrainNetworkBackground = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const [isReady, setIsReady] = useState(false);
+
+    // Defer heavy canvas initialization to unblock first paint
+    useEffect(() => {
+        const timeoutId = setTimeout(() => setIsReady(true), 100);
+        return () => clearTimeout(timeoutId);
+    }, []);
 
     useEffect(() => {
+        if (!isReady) return;
+
         const canvas = canvasRef.current;
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
@@ -23,6 +32,7 @@ const BrainNetworkBackground = () => {
         let rotationY = Math.PI / 2;
         let mouseX = -1000;
         let mouseY = -1000;
+        let animId: number;
 
         interface Point3D {
             x: number;
@@ -237,14 +247,14 @@ const BrainNetworkBackground = () => {
 
                 ctx.globalCompositeOperation = 'source-over';
 
-                requestAnimationFrame(animate);
+                animId = requestAnimationFrame(animate);
 
             } catch (err) {
                 console.error("Brain animation error:", err);
             }
         };
 
-        const animId = requestAnimationFrame(animate);
+        animId = requestAnimationFrame(animate);
 
         const handleResize = () => {
             width = canvas.width = canvas.offsetWidth;
@@ -260,7 +270,7 @@ const BrainNetworkBackground = () => {
             canvas.removeEventListener('mousemove', handleMouseMove);
             canvas.removeEventListener('mouseleave', handleMouseLeave);
         };
-    }, []);
+    }, [isReady]);
 
     return (
         <canvas
