@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { SignedIn, SignedOut, SignInButton } from '@clerk/clerk-react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, MessageSquare } from 'lucide-react';
@@ -74,7 +74,7 @@ const LandingPage = () => {
                     animate={introComplete ? { opacity: 1, y: 0 } : { opacity: 0, y: 100 }}
                     transition={{ duration: 1, ease: "easeOut" }}
                 >
-                    <ScrollProgress containerRef={containerRef} />
+                    <ScrollProgress containerRef={containerRef as any} />
 
                     {/* Background Texture/Gradient */}
                     <div className="fixed inset-0 z-0 pointer-events-none">
@@ -205,11 +205,11 @@ const LandingPage = () => {
 
 
                     {/* --- SECTION 2: THE MAGIC (Assessment) - REPLACED WITH CHAOTIC ASSEMBLY --- */}
-                    <ChaoticAssemblySection scrollContainerRef={containerRef} />
+                    <ChaoticAssemblySection scrollContainerRef={containerRef as any} />
 
 
                     {/* --- SECTION 2.5: HORIZONTAL FLOW (How it Works) --- */}
-                    <HorizontalProcessSection scrollContainerRef={containerRef} />
+                    <HorizontalProcessSection scrollContainerRef={containerRef as any} />
 
                     {/* --- SECTION 3: THE REVEAL (Dashboard) - REPLACED WITH GRAVITY BUILDER --- */}
                     <DashboardBuilderSection scrollContainerRef={containerRef} />
