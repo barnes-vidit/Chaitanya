@@ -5,7 +5,7 @@ export const ClockDrawingTask = ({ onComplete, isDarkMode = false }: { onComplet
     // Generate random time on mount
     const [targetTime] = useState(() => {
         const h = Math.floor(Math.random() * 12) + 1;
-        const m = Math.floor(Math.random() * 12) * 5; // Multiples of 5 for easier reading initially, or 0-59
+
         // Let's do completely random minutes as requested for 'dynamic'
         const randomMinute = Math.floor(Math.random() * 60);
         return { hour: h, minute: randomMinute };

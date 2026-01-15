@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { SignedIn, SignedOut, SignInButton } from '@clerk/clerk-react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Sparkles, MessageSquare, Activity } from 'lucide-react';
+import { ArrowRight, MessageSquare } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import LandingSection from '../components/landing/LandingSection';
 import ScrollProgress from '../components/landing/ScrollProgress';
@@ -13,9 +13,7 @@ import DashboardBuilderSection from '../components/landing/DashboardBuilderSecti
 import BrainNetworkBackground from '../components/landing/BrainNetworkBackground';
 
 // Import Assets
-import heroBg from '../assets/landing/hero-neural.png';
 import chatIllustration from '../assets/landing/illustration-chat.png';
-import dashboardIllustration from '../assets/landing/illustration-dashboard.png';
 
 const LandingPage = () => {
     const containerRef = useRef<HTMLDivElement>(null);

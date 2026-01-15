@@ -1,13 +1,13 @@
 import React, { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
-import { Activity, BarChart3, TrendingUp, AlertOctagon } from 'lucide-react';
+import { BarChart3, TrendingUp, AlertOctagon } from 'lucide-react';
 
-const DashboardBuilderSection = ({ scrollContainerRef }: { scrollContainerRef?: React.RefObject<HTMLElement> }) => {
+const DashboardBuilderSection = ({ scrollContainerRef }: { scrollContainerRef?: React.RefObject<any> }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const isInView = useInView(containerRef, { root: scrollContainerRef, once: true, margin: "-100px" });
 
     // Physics constants for the drop
-    const dropTransition = {
+    const dropTransition: any = {
         type: "spring",
         damping: 20,
         stiffness: 300,

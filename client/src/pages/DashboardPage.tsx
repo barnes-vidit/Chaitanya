@@ -1,15 +1,14 @@
+```
 import { useEffect, useState } from 'react';
 import { useAuth, useUser } from '@clerk/clerk-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { User, Bell, Sparkles, Activity, Brain, ArrowRight } from 'lucide-react';
+import { Bell, Sparkles, Activity, Brain, ArrowRight } from 'lucide-react';
 
 import CircularProgress from '../components/dashboard/CircularProgress';
 import CognitiveProfileCard from '../components/dashboard/CognitiveProfileCard';
 import CognitiveTrendChart from '../components/dashboard/CognitiveTrendChart';
-import ActionCard from '../components/dashboard/ActionCard';
 import RecentActivityList from '../components/dashboard/RecentActivityList';
-import EmptyState from '../components/dashboard/EmptyState';
 
 const DashboardPage = () => {
     const { getToken, isLoaded } = useAuth();
@@ -23,8 +22,8 @@ const DashboardPage = () => {
             if (!isLoaded) return;
             try {
                 const token = await getToken();
-                const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/dashboard/stats`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                const response = await fetch(`${ import.meta.env.VITE_API_URL || 'http://localhost:5000' } /api/dashboard / stats`, {
+                    headers: { 'Authorization': `Bearer ${ token } ` }
                 });
                 if (response.ok) {
                     const data = await response.json();
@@ -41,7 +40,6 @@ const DashboardPage = () => {
 
     // Data Processing
     const hasData = stats?.stats?.totalAssessments > 0;
-    const avgScore = stats?.stats?.avgScore || 0;
     const memoryPercentage = stats?.stats?.profile?.memory || 0;
     const riskLevel = stats?.stats?.riskScore || "Low";
 
@@ -76,7 +74,7 @@ const DashboardPage = () => {
                             Good {new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 18 ? 'Afternoon' : 'Evening'}, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">{user?.firstName}</span>
                         </h1>
                         <p className="text-gray-300 text-lg max-w-xl font-light leading-relaxed">
-                            Ready to strengthen your mind today? Your cognitive health looks <span className={`font-semibold ${riskLevel === 'Low' ? 'text-teal-400' : 'text-rose-400'}`}>{riskLevel} Risk</span>.
+                            Ready to strengthen your mind today? Your cognitive health looks <span className={`font - semibold ${ riskLevel === 'Low' ? 'text-teal-400' : 'text-rose-400' } `}>{riskLevel} Risk</span>.
                         </p>
                     </div>
 
@@ -115,7 +113,7 @@ const DashboardPage = () => {
                             <div className="flex justify-center py-2 relative z-10">
                                 <CircularProgress
                                     value={memoryPercentage}
-                                    label={hasData ? `${Math.round(memoryPercentage)}%` : "N/A"}
+                                    label={hasData ? `${ Math.round(memoryPercentage) }% ` : "N/A"}
                                     subLabel=""
                                     size={180}
                                     color={memoryPercentage > 75 ? "#2dd4bf" : memoryPercentage > 50 ? "#facc15" : "#f43f5e"}

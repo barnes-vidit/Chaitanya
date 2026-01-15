@@ -3,11 +3,10 @@ import { motion } from 'framer-motion';
 
 interface LogoProps {
     className?: string;
-    showFull?: boolean;
     layoutIdPrefix?: string;
 }
 
-const Logo: React.FC<LogoProps> = ({ className = '', showFull = true, layoutIdPrefix = 'chaitanya-logo' }) => {
+const Logo: React.FC<LogoProps> = ({ className = '', layoutIdPrefix = 'chaitanya-logo' }) => {
     return (
         <div className={`relative inline-flex items-baseline justify-center ${className} select-none`}>
             <style>{`

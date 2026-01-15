@@ -1,5 +1,4 @@
-
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Sparkles, Play, CheckCircle2, RotateCcw, Brain, Clock, XCircle } from 'lucide-react';
 
 const WORD_BANK = [
@@ -100,7 +99,6 @@ export const MemoryRecallTask = ({ onComplete, difficulty = "Medium", isDarkMode
         }
 
         // Check completion
-        const allTargetsFound = targetWords.every(t => newSelection.includes(t));
         // Or if they've clicked too many things (limit guesses to avoid brute force?)
         // Let's simpler: Finish when they've picked 'targetCount' items or maybe allow more?
         // Let's finish when they have selected 'targetCount' items total.
