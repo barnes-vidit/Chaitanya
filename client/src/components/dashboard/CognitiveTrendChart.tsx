@@ -28,7 +28,7 @@ const CognitiveTrendChart = ({ data }: ChartProps) => {
                     <EmptyState
                         icon={BarChart2}
                         title="Not Enough Data"
-                        description="Complete more assessments to see your cognitive trend analysis."
+                        description="Complete more activities to see your cognitive trend analysis."
                     />
                 ) : (
                     <ResponsiveContainer width="100%" height="100%">

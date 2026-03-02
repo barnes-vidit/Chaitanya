@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuth, useUser } from '@clerk/clerk-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Bell, Sparkles, Activity, Brain, ArrowRight } from 'lucide-react';
+import { Bell, Sparkles, Activity } from 'lucide-react';
 
 import CircularProgress from '../components/dashboard/CircularProgress';
 import CognitiveProfileCard from '../components/dashboard/CognitiveProfileCard';
@@ -97,10 +97,31 @@ const DashboardPage = () => {
                 </motion.div>
 
                 {/* 2. Bento Grid Layout */}
-                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                    {/* COL 1: Key Metrics (Memory & Profile) */}
-                    <div className="space-y-6 lg:col-span-1">
+                    {/* COL 1: Quick Actions & Key Metrics */}
+                    <div className="space-y-6 lg:col-span-1 flex flex-col">
+
+                        {/* Quick Actions Moved to Top Left */}
+                        <div>
+                            <h3 className="font-bold text-white/90 text-lg mb-4 flex items-center gap-2">
+                                <span className="w-1 h-6 bg-gradient-to-b from-blue-500 to-indigo-600 rounded-full"></span>
+                                Start Activity
+                            </h3>
+                            <button
+                                onClick={() => navigate('/chat')}
+                                className="w-full bg-[#1A1B2E] text-blue-100 p-8 rounded-2xl border border-white/5 hover:bg-[#232438] hover:border-white/10 transition-all flex items-center justify-center gap-6 group shadow-lg shadow-indigo-900/10"
+                            >
+                                <div className="p-4 bg-teal-500/10 rounded-2xl group-hover:bg-teal-500/20 transition-colors">
+                                    <Sparkles className="w-8 h-8 text-teal-400 group-hover:scale-110 transition-transform" />
+                                </div>
+                                <div className="text-left">
+                                    <p className="font-bold text-lg text-white">Chat Companion</p>
+                                    <p className="text-sm text-slate-400 group-hover:text-slate-300 transition-colors">Start a Casual Conversation</p>
+                                </div>
+                            </button>
+                        </div>
+
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
@@ -121,59 +142,19 @@ const DashboardPage = () => {
                             </div>
                         </motion.div>
 
-                        <div className="bg-[#121212] rounded-[2rem] p-6 border border-white/5 shadow-lg">
+                        <div className="bg-[#121212] rounded-[2rem] p-6 border border-white/5 shadow-lg flex-1">
                             <CognitiveProfileCard profile={stats?.stats?.profile || { memory: 0, attention: 0, language: 0 }} />
                         </div>
                     </div>
 
-                    {/* COL 2: Main Activity Feed & Chart (Span 2) */}
-                    <div className="space-y-6 md:col-span-2 lg:col-span-2">
+                    {/* COL 2 & 3: Main Activity Feed & Chart */}
+                    <div className="space-y-6 lg:col-span-2 flex flex-col">
                         {/* Trend Chart */}
                         <CognitiveTrendChart data={stats?.trends?.cognitive} />
 
                         {/* Recent Timeline */}
-                        <RecentActivityList activities={stats?.recentActivity || []} />
-                    </div>
-
-                    {/* COL 3: Quick Actions */}
-                    <div className="space-y-6 lg:col-span-1">
-                        <div>
-                            <h3 className="font-bold text-white/90 text-lg mb-4 flex items-center gap-2">
-                                <span className="w-1 h-6 bg-gradient-to-b from-blue-500 to-indigo-600 rounded-full"></span>
-                                Start Activity
-                            </h3>
-                            <div className="space-y-3">
-                                <button
-                                    onClick={() => navigate('/chat')}
-                                    className="w-full bg-gradient-to-r from-indigo-600 to-violet-600 text-white p-4 rounded-2xl shadow-lg shadow-indigo-900/20 hover:shadow-indigo-600/40 hover:scale-[1.02] transition-all flex items-center justify-between group border border-indigo-400/20"
-                                >
-                                    <div className="flex items-center gap-4">
-                                        <div className="p-2.5 bg-white/10 rounded-xl backdrop-blur-sm">
-                                            <Brain className="w-5 h-5 text-white" />
-                                        </div>
-                                        <div className="text-left">
-                                            <p className="font-bold text-sm">Memory Test</p>
-                                            <p className="text-xs text-indigo-200">Start Assessment</p>
-                                        </div>
-                                    </div>
-                                    <ArrowRight className="w-5 h-5 text-white/50 group-hover:translate-x-1 group-hover:text-white transition-all" />
-                                </button>
-
-                                <button
-                                    onClick={() => navigate('/chat')}
-                                    className="w-full bg-[#1A1B2E] text-blue-100 p-4 rounded-2xl border border-white/5 hover:bg-[#232438] hover:border-white/10 transition-all flex items-center justify-between group"
-                                >
-                                    <div className="flex items-center gap-4">
-                                        <div className="p-2.5 bg-teal-500/10 rounded-xl">
-                                            <Sparkles className="w-5 h-5 text-teal-400" />
-                                        </div>
-                                        <div className="text-left">
-                                            <p className="font-bold text-sm">Chat Companion</p>
-                                            <p className="text-xs text-slate-500 group-hover:text-slate-400">Casual Conversation</p>
-                                        </div>
-                                    </div>
-                                </button>
-                            </div>
+                        <div className="flex-1">
+                            <RecentActivityList activities={stats?.recentActivity || []} />
                         </div>
 
                         {/* Recommendation Card */}

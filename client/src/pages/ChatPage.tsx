@@ -293,6 +293,9 @@ const ChatPage = () => {
                         <a href="/" className={`hidden md:flex items-center gap-2 text-xs font-medium ${isDarkMode ? 'text-gray-400 hover:text-white hover:bg-white/10' : 'text-text-secondary hover:text-primary hover:bg-gray-100'} px-3 py-1.5 rounded-full transition-all`}>
                             <span>Home</span>
                         </a>
+                        <a href="/dashboard" className={`hidden md:flex items-center gap-2 text-xs font-medium ${isDarkMode ? 'text-gray-400 hover:text-white hover:bg-white/10' : 'text-text-secondary hover:text-primary hover:bg-gray-100'} px-3 py-1.5 rounded-full transition-all`}>
+                            <span>Dashboard</span>
+                        </a>
                         <button onClick={toggleFullscreen} className={`p-2 ${isDarkMode ? 'text-gray-400 hover:text-white hover:bg-white/10' : 'text-text-secondary hover:text-primary hover:bg-gray-100'} rounded-full transition-all`}>
                             {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
                         </button>
