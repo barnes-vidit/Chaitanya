@@ -10,7 +10,7 @@ export const getDashboardStats = async (req: AuthRequest, res: Response) => {
 
         // 1. Fetch Core Data
         const [assessments, chats, sessionStates] = await Promise.all([
-            Assessment.find({ patientId: userId }).sort({ createdAt: -1 }).limit(20),
+            Assessment.find({ patientId: userId, type: { $nin: ['MMSE', 'GDS'] } }).sort({ createdAt: -1 }).limit(20),
             Chat.find({ participants: userId }).sort({ lastMessageAt: -1 }).limit(10),
             SessionState.find({ userId }).sort({ updatedAt: -1 }) // Get all sessions to aggregate tasks
         ]);
@@ -35,7 +35,7 @@ export const getDashboardStats = async (req: AuthRequest, res: Response) => {
         // Process Assessments (Heavy weight)
         assessments.forEach((a: any) => {
             const scorePct = (a.totalScore / (a.maxScore || 30)) * 100;
-            // MMSE covers all, but let's attribute it to Memory & Language primarily
+            // Assessment covers all, but let's attribute it to Memory & Language primarily
             profile.memory += scorePct; counts.memory++;
             profile.language += scorePct; counts.language++;
             profile.attention += scorePct; counts.attention++;

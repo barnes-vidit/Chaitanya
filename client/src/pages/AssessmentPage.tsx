@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { assessments } from '../data/assessments';
 import type { AssessmentType } from '../data/assessments';
-import { ArrowLeft, ArrowRight, CheckCircle, Brain, Activity } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle, Activity } from 'lucide-react';
 import { useAuth } from '@clerk/clerk-react';
 
 const AssessmentPage = () => {
@@ -116,7 +116,7 @@ const AssessmentPage = () => {
                                 className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer group"
                             >
                                 <div className="h-12 w-12 bg-indigo-50 rounded-xl flex items-center justify-center mb-4 group-hover:bg-indigo-100 transition-colors">
-                                    {a.id === 'MMSE' ? <Brain className="h-6 w-6 text-indigo-600" /> : <Activity className="h-6 w-6 text-indigo-600" />}
+                                    <Activity className="h-6 w-6 text-indigo-600" />
                                 </div>
                                 <h3 className="text-xl font-bold text-gray-900 mb-2">{a.title}</h3>
                                 <p className="text-gray-500 mb-4">{a.description}</p>

@@ -79,7 +79,8 @@ export const submitAssessment = async (req: AuthRequest, res: Response) => {
 export const getAssessmentHistory = async (req: AuthRequest, res: Response) => {
     try {
         const assessments = await Assessment.find({
-            patientId: req.user.id
+            patientId: req.user.id,
+            type: { $nin: ['MMSE', 'GDS'] }
         }).sort({ createdAt: -1 });
 
         res.json(assessments);
