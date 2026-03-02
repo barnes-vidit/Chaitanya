@@ -37,7 +37,7 @@ const ChaoticAssemblySection = ({ scrollContainerRef }: { scrollContainerRef?: R
                 {/* Background Text needing explanation? */}
                 <motion.div
                     style={{ opacity: useTransform(scrollYProgress, [0, 0.2, 0.6], [0, 1, 0]) }}
-                    className="absolute top-28 md:top-32 text-center z-10 px-4"
+                    className="absolute top-8 md:top-16 lg:top-24 text-center z-10 px-4"
                 >
                     <h2 className="text-3xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-white via-blue-100 to-gray-400 bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(255,255,255,0.3)]">
                         Hidden in Plain Sight
@@ -47,7 +47,7 @@ const ChaoticAssemblySection = ({ scrollContainerRef }: { scrollContainerRef?: R
 
                 <motion.div
                     style={{ opacity: useTransform(scrollYProgress, [0.5, 0.6], [0, 1]) }}
-                    className="absolute top-28 md:top-32 text-center z-10 px-4"
+                    className="absolute top-8 md:top-16 lg:top-24 text-center z-10 px-4"
                 >
                     <h2 className="text-3xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-purple-400 to-white bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(60,130,246,0.4)]">
                         Invisible Assessment
@@ -57,7 +57,7 @@ const ChaoticAssemblySection = ({ scrollContainerRef }: { scrollContainerRef?: R
 
 
                 {/* The Phone/Interface Container */}
-                <div className="relative w-[300px] md:w-[400px] h-[450px] md:h-[600px] mt-24 md:mt-40 bg-[#050505]/80 backdrop-blur-3xl border border-white/20 rounded-[2.5rem] md:rounded-[3rem] shadow-[0_0_60px_-15px_rgba(30,58,138,0.5)] overflow-hidden flex flex-col z-20 transition-all duration-500 hover:shadow-[0_0_80px_-10px_rgba(147,51,234,0.4)]">
+                <div className="relative w-[300px] md:w-[400px] h-[450px] md:h-[600px] mt-32 md:mt-48 lg:mt-56 bg-[#050505]/80 backdrop-blur-3xl border border-white/20 rounded-[2.5rem] md:rounded-[3rem] shadow-[0_0_60px_-15px_rgba(30,58,138,0.5)] overflow-hidden flex flex-col z-20 transition-all duration-500 hover:shadow-[0_0_80px_-10px_rgba(147,51,234,0.4)]">
                     {/* Glossy Reflection */}
                     <div className="absolute inset-0 bg-gradient-to-tr from-white/10 via-transparent to-transparent pointer-events-none z-50 rounded-[3rem]" />
 
